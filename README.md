@@ -15,7 +15,10 @@ Nail down the project topic and description. It's no problem to completely chang
 If boids is the way to go:
 
 - animation: interactive sliders for input parameters (like field of view (FOW) angle, cohesion strength, etc.), mouse interface would be nice to have already maybe to play around and explore possibilities.
-- `Boid` class: <@Jacqueline, bitte deine Zielsetzung grob umschreiben>
+	- show a boid as a pointy triangle
+	- boids have velocity vectors
+		- acceleration vectors could be interesting, showing where the boid wants to go
+- `Boid` class: <Jacqueline>
 - joint: working interface of data structures, calculations and animations.
 
 ### things to discuss
