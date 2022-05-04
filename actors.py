@@ -11,11 +11,11 @@ class Actor:
         self.view_dist = float(view_distance)  # how far the actor can see
         self.view_angle = float(view_angle)  # in radians
 
-    def move(self):
-        self.pos += self.v
+    def move(self, dt):
+        self.pos += self.v * dt
 
-    def apply_force(self, force):
-        self.v += force
+    def apply_force(self, force, dt):
+        self.v += force * dt
         # scale the velocity to the desired speed
         self.v = self.speed * self.v.normalize()
 
@@ -29,14 +29,15 @@ class Actor:
 class Boid(Actor):
     """Boid class."""
 
-    def __init__(self, position, velocity, speed, view_distance, view_angle):
+    def __init__(self, position, velocity, speed, view_distance, view_angle, flock):
         Actor.__init__(self, position, velocity, speed, view_distance, view_angle)
         self.neighbors = []
+        self.flock = flock
 
-    def get_neighbors(self, flock):
+    def get_neighbors(self):
         """Gets all the neighbors that are visible to the boid."""
         self.neighbors = []
-        for member in flock:
+        for member in self.flock:
             if member is self:
                 continue
             elif self.pos.distance_to(member.pos) <= self.view_dist ** 2 and self.in_fov(member.pos):
