@@ -34,9 +34,10 @@ If boids is the way to go:
 - animation: interactive sliders for input parameters (like field of view (FOW) angle, cohesion strength, etc.), mouse interface would be nice to have already maybe to play around and explore possibilities.
   - show a boid as a pointy triangle
   - boids have velocity vectors
-    - acceleration vectors could be interesting, showing where the boid wants to go
+    - () acceleration vectors could be interesting, showing where the boid wants to go
+- pygame, good start: [some yt video](https://www.youtube.com/watch?v=cFq3dKa6q0o), pygame looks quite simple to get up and running, compared to matplotlib (use `pip install pygame` in the boid conda env on windows to install without error (version 2.1.2 or so))
+
 - `Boid` class: <Jacqueline>
-- joint: working interface of data structures, calculations and animations.
 
 ### things to discuss
 
