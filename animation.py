@@ -1,7 +1,7 @@
 import numpy as np
 # from actors import Actor, Boid  # QU: What is module Actor needed for? TBD in future?
 from actors import Boid
-from itertools import count
+#from itertools import count
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
@@ -45,7 +45,7 @@ class Simulation:
 
 
 def animate(i, ani, dt_animate):
-    ani:Simulation
+    ani: Simulation
     boids = ani.actors
 
     plt.clf()  # clear axis, if axis should change
@@ -53,9 +53,9 @@ def animate(i, ani, dt_animate):
     for boid in boids:
         xp = boid.pos[0]
         yp = boid.pos[1]
-        xv = boid.v[0]
-        yv = boid.v[1]
-        #plt.plot([xp, xp+xv], [yp, yp+yv], c="black", ls="-")
+        # xv = boid.v[0]
+        # yv = boid.v[1]
+
         plt.scatter(xp, yp, c="black")
         # could also first create one np.array of all boids and call plt.plot() once for whole array
 
@@ -64,27 +64,13 @@ def animate(i, ani, dt_animate):
     ani.run(1, dt_animate)
 
 
-def main(N=10, fps=1):
-    index = count()
-
-    sim = Simulation()
-    sim.setup(N)
+def main(Sim, fps):
 
     dt_main = fps/1000
-    ani = FuncAnimation(plt.gcf(), animate, fargs=(sim, dt_main,), interval=dt_main)
-    # QU: how to pass additional functions to animate()? Investigate FuncAnimation doc.
+    ani = FuncAnimation(plt.gcf(), animate, fargs=(Sim, dt_main,), interval=dt_main)
 
     plt.tight_layout()
-
-    #plt.show()
     ani.save("boids.gif", writer="pillow")
-    # TypeError: 'NoneType' object is not callable
-    # probably the animate(.,.,.) call inside the FuncAnimation(.,.,.) call assigned to 'ani'
-
-    # ani: incorporate sim.run() into the animate() function
-    # sim = Simulation()
-    # sim.setup(10)
-    # sim.run(10, 1)
 
 
 if __name__ == "__main__":

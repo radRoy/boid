@@ -1,6 +1,7 @@
 import numpy as np
 # from actors import Actor, Boid  # QU: What is module Actor needed for? TBD in future?
 from actors import Boid
+import animation
 
 
 class Simulation:
@@ -23,8 +24,6 @@ class Simulation:
                        view_angle=2 * np.pi,
                        flock=flock)
 
-            # QU: Is new.flock an alias of flock?
-            # (= will new.flock be updated when another Boid() joins the flock?)
             new.flock = flock
             flock.append(new)
             self.actors.append(new)
@@ -41,10 +40,10 @@ class Simulation:
             # needed for animation: actor.pos, actor.v
 
 
-def main():
+def main(N=10, fps=1):
     sim = Simulation()
-    sim.setup(10)
-    sim.run(10, 1)
+    sim.setup(N)  # N boids (flock, no pred. currently)
+    animation.main(sim, fps)
 
 
 if __name__ == "__main__":
