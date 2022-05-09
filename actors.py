@@ -17,7 +17,7 @@ class Actor:
     def apply_force(self, force, dt):
         self.v += force * dt
         # scale the velocity to the desired speed (currently constant speed)
-        self.v = self.speed * self.v.normalize()
+        self.v = self.v.normalize()*self.speed
 
     def in_fov(self, point):
         """Checks if a given point is in the field of view"""
@@ -51,7 +51,7 @@ class Boid(Actor):
 
         return separation + alignment + cohesion
 
-    def calc_separation(self, strength, rad_sq=1.0):
+    def calc_separation(self, strength, rad_sq=0.1):
         if not self.neighbors:
             return Vector(0, 0)
 

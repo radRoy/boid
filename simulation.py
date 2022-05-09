@@ -1,5 +1,4 @@
 import numpy as np
-# from actors import Actor, Boid  # QU: What is module Actor needed for? TBD in future?
 from actors import Boid
 import animation
 
@@ -20,8 +19,8 @@ class Simulation:
             new = Boid(position=positions[i],
                        velocity=velocities[i],
                        speed=1,
-                       view_distance=2,
-                       view_angle=2 * np.pi,
+                       view_distance=1,
+                       view_angle=2*np.pi,
                        flock=flock)
 
             new.flock = flock
@@ -35,12 +34,17 @@ class Simulation:
             # ani: t+=dt
 
     def step(self, dt):
+        # test = self.actors[0]
+        # print(f"{test.v}")
         for actor in self.actors:
             actor.move(dt)  # currently, velocity is constant
+            actor.get_neighbors()
+            force = actor.calc_forces(2, 1, 1)
+            actor.apply_force(force, dt)
             # needed for animation: actor.pos, actor.v
 
 
-def main(N=10, fps=1):
+def main(N=50, fps=10):
     sim = Simulation()
     sim.setup(N)  # N boids (flock, no pred. currently)
     animation.main(sim, fps)

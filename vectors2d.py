@@ -25,11 +25,21 @@ class Vector(tuple):
         return Vector(-self.x, -self.y)
 
     def __mul__(self, other):
-        if isinstance(other, (int, float)):
-            return Vector(self.x * other, self.y * other)
-        else:
+        if isinstance(other, Vector):
             # Multiplication turns into dot product if the other object is also a Vector
             return self.dot(other)
+        else:
+            return Vector(self.x * other, self.y * other)
+
+    def __rmul__(self, other):
+        if isinstance(other, Vector):
+            # Multiplication turns into dot product if the other object is also a Vector
+            return other.dot(self)
+        else:
+            return Vector(other * self.x, other * self.y)
+
+    def __truediv__(self, other):
+        return Vector(self.x / other, self.y / other)
 
     def length_sq(self):
         """Returns the squared length (magnitude) of the vector."""
@@ -68,5 +78,5 @@ class Vector(tuple):
 
     def angle_to(self, point):
         """Returns the smallest, unsigned angle to a given point."""
-        dot_prod = self.normalize().dot(point.normalize)
+        dot_prod = self.normalize().dot(point.normalize())
         return math.acos(dot_prod)

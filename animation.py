@@ -27,8 +27,8 @@ def animate(i, ani, dt_animate):
 
 def main(Sim, fps):
 
-    dt_main = fps/1000
-    ani = FuncAnimation(plt.gcf(), animate, fargs=(Sim, dt_main,), interval=dt_main)
+    dt_main = 1/fps
+    ani = FuncAnimation(plt.gcf(), animate, frames=200, fargs=(Sim, dt_main,), interval=dt_main)
 
     plt.tight_layout()
     ani.save("boids.gif", writer="pillow")
