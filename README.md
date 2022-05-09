@@ -93,21 +93,10 @@ animation:
   3.2. mouse interaction (matplotlib mouse cursors (doc))
 
 
-## official task until Montag, 16.5.2022
-.
+### boids = arrows
 
-## official task until Montag, 23.5.2022
-.
+- [matplotlib self-making markerstyle](https://matplotlib.org/stable/gallery/shapes_and_collections/arrow_guide.html)
 
-## official task until Montag, 30.5.2022
-... presentation?
+- quiver plots work as scatter plots, too, it turns out.
 
-## Code files provided for initial animation setup
-
-Daniel: So far, stuff in `archive` folders are ones I might have taken code from.
-
-## By The Way
-
-ESC202 = Simulations in the Natural Sciences 2 (sins2)
-
-## Thoughts?
+- an alternative is to draw arrows myself in plt.plot() command
