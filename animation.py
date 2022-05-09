@@ -20,13 +20,20 @@ def animate(i, sim, dt_animate):
     sim.run(1, dt_animate)
 
 
-def main(sim, fps):
+def main(simulation, fps):
 
     dt_main = 1/fps
     wait_duration = 1000/fps
 
-    ani = FuncAnimation(plt.gcf(), animate, frames=200, fargs=(sim, dt_main,), interval=wait_duration)
+    ani = FuncAnimation(plt.gcf(), animate, frames=200, fargs=(simulation, dt_main,), interval=wait_duration)
     # frames = <number of total frames to animate>
 
     plt.tight_layout()
     ani.save("boids_vel.gif", writer="pillow")  # This step takes very long - wihtout it, runtime < 1sec
+
+
+if __name__ == "__main__":
+    import simulation as s
+    sim = s.Simulation()
+    sim.setup(nboids=50)
+    main(simulation=s.Simulation(), fps=10)
