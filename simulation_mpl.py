@@ -45,16 +45,18 @@ class Simulation:
 
 
 def animate(i, ani, dt_animate):
+    ani:Simulation
     boids = ani.actors
 
-    # plt.cla()  # clear axis, if axis should change
+    plt.clf()  # clear axis, if axis should change
 
     for boid in boids:
         xp = boid.pos[0]
         yp = boid.pos[1]
         xv = boid.v[0]
         yv = boid.v[1]
-        plt.plot([xp, xp+xv], [yp, yp+yv], c="black", ls="-")
+        #plt.plot([xp, xp+xv], [yp, yp+yv], c="black", ls="-")
+        plt.scatter(xp, yp, c="black")
         # could also first create one np.array of all boids and call plt.plot() once for whole array
 
     plt.tight_layout()
@@ -69,14 +71,15 @@ def main(N=10, fps=1):
     sim.setup(N)
 
     dt_main = fps/1000
-    ani = FuncAnimation(plt.gcf(), animate(index, sim, dt_main), interval=dt_main)
+    ani = FuncAnimation(plt.gcf(), animate, fargs=(sim, dt_main,), interval=dt_main)
     # QU: how to pass additional functions to animate()? Investigate FuncAnimation doc.
 
     plt.tight_layout()
+
+    #plt.show()
+    ani.save("boids.gif", writer="pillow")
     # TypeError: 'NoneType' object is not callable
     # probably the animate(.,.,.) call inside the FuncAnimation(.,.,.) call assigned to 'ani'
-
-    plt.show()
 
     # ani: incorporate sim.run() into the animate() function
     # sim = Simulation()
@@ -85,4 +88,6 @@ def main(N=10, fps=1):
 
 
 if __name__ == "__main__":
-    main()
+    print("main namespace")
+    main(100, 10)
+    print("main() done.")
