@@ -1,6 +1,8 @@
 import numpy as np
 # from actors import Actor, Boid  # QU: What is module Actor needed for? TBD in future?
 from actors import Boid
+import matplotlib.pyplot as plt
+from matplotlib.animation import ArtistAnimation
 
 
 class Simulation:

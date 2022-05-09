@@ -1,6 +1,7 @@
 import numpy as np
 # from actors import Actor, Boid  # QU: What is module Actor needed for? TBD in future?
 from actors import Boid
+import pygame
 
 
 class Simulation:
@@ -39,6 +40,7 @@ class Simulation:
         for actor in self.actors:
             actor.move(dt)  # currently, velocity is constant
             # needed for animation: actor.pos, actor.v
+
 
 
 def main():

@@ -16,7 +16,7 @@ class Actor:
 
     def apply_force(self, force, dt):
         self.v += force * dt
-        # scale the velocity to the desired speed
+        # scale the velocity to the desired speed (currently constant speed)
         self.v = self.speed * self.v.normalize()
 
     def in_fov(self, point):
