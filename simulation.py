@@ -44,7 +44,11 @@ class Simulation:
             # needed for animation: actor.pos, actor.v
 
 
+<<<<<<< Updated upstream
 def main(N=50, fps=10):
+=======
+def main(N=10, fps=10):
+>>>>>>> Stashed changes
     sim = Simulation()
     sim.setup(N)  # N boids (flock, no pred. currently)
     animation.main(sim, fps)

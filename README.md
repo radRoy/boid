@@ -1,3 +1,4 @@
+
 # Simulation of 'Boids' - studying emergence of complex group behaviour from simple algorithms
 
 created on Montag, 2.5.2022
@@ -57,10 +58,11 @@ If boids is the way to go:
 
 ### things to discuss
 
-- "We like things that make us go fast.", i.e., to `jit` or not to `jit`?
+- POSTPONE "We like things that make us go fast.", i.e., to `jit` or not to `jit`?
   - or even to `jitclass`?
   - both cases: beware so-called `reflected lists` and the like (see the [Deprecation Notices](https://numba.pydata.org/numba-doc/latest/reference/deprecation.html?highlight=list%20deprecation) of the Numba documentation page
 - More/Less organisation? How to proceed?
+  - fine, faster
 - conda python environment:
   - [conda environments](https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html): You can also share your environment with someone by giving them a copy of your `environment.yaml` file.
   - [conda: managing environments](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
@@ -68,7 +70,7 @@ If boids is the way to go:
 
 ### progress report
 
-.
+- [matplotlib.widget example (sliders)](https://matplotlib.org/stable/gallery/widgets/slider_demo.html#sphx-glr-gallery-widgets-slider-demo-py) - works without pycharm (conda environment via anaconda prompt works 1st try)
 
 ## official task until Montag, 16.5.2022
 .
