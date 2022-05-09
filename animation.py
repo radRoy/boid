@@ -23,13 +23,10 @@ def animate(i, sim, dt_animate):
 def main(sim, fps):
 
     dt_main = 1/fps
-<<<<<<< Updated upstream
-    ani = FuncAnimation(plt.gcf(), animate, frames=200, fargs=(Sim, dt_main,), interval=dt_main)
-=======
     wait_duration = 1000/fps
-    ani = FuncAnimation(plt.gcf(), animate, fargs=(sim, dt_main,), interval=wait_duration)
+
+    ani = FuncAnimation(plt.gcf(), animate, frames=200, fargs=(sim, dt_main,), interval=wait_duration)
     # frames = <number of total frames to animate>
->>>>>>> Stashed changes
 
     plt.tight_layout()
     ani.save("boids_vel.gif", writer="pillow")  # This step takes very long - wihtout it, runtime < 1sec
