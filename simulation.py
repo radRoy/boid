@@ -10,7 +10,7 @@ class Simulation:
     def setup(self, nboids):
         # Create random positions and velocities
         positions = np.random.rand(nboids, 2)
-        velocities = np.random.rand(nboids, 2)
+        velocities = np.random.uniform(-1, 1, (nboids, 2))
 
         flock = []
 
@@ -19,8 +19,8 @@ class Simulation:
             new = Boid(position=positions[i],
                        velocity=velocities[i],
                        speed=1,
-                       view_distance=1,
-                       view_angle=2*np.pi,
+                       view_distance=2,
+                       view_angle=np.pi,
                        flock=flock)
 
             new.flock = flock
@@ -28,14 +28,10 @@ class Simulation:
             self.actors.append(new)
 
     def run(self, steps, dt):
-        # ani: t=0
         for i in range(steps):
             self.step(dt)
-            # ani: t+=dt
 
     def step(self, dt):
-        # test = self.actors[0]
-        # print(f"{test.v}")
         for actor in self.actors:
             actor.move(dt)  # currently, velocity is constant
             actor.get_neighbors()
