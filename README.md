@@ -70,7 +70,28 @@ If boids is the way to go:
 
 ### progress report
 
-- [matplotlib.widget example (sliders)](https://matplotlib.org/stable/gallery/widgets/slider_demo.html#sphx-glr-gallery-widgets-slider-demo-py) - works without pycharm (conda environment via anaconda prompt works 1st try)
+- flocking behaviour works
+- animation video (not interactive)
+- improvised velocity arrow implemented
+
+
+**TBD:**
+
+flocking:
+- parameter herumpsielen & optimieren
+- obstacle avoidance
+
+
+animation:
+0. allg.: **see code archive sins1**
+1. faster animation
+2. live animation (ideally interruptable with video save)
+  2.1 initialise independent of pycharm
+3. interactive:
+  3.1. sliders
+    3.1.1 [matplotlib.widget example (sliders)](https://matplotlib.org/stable/gallery/widgets/slider_demo.html#sphx-glr-gallery-widgets-slider-demo-py) - works without pycharm (conda environment via anaconda prompt works 1st try
+  3.2. mouse interaction (matplotlib mouse cursors (doc))
+
 
 ## official task until Montag, 16.5.2022
 .
