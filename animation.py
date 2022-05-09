@@ -1,7 +1,7 @@
 import numpy as np
 # from actors import Actor, Boid  # QU: What is module Actor needed for? TBD in future?
-from actors import Boid
-#from itertools import count
+
+# from itertools import count
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
@@ -32,9 +32,3 @@ def main(Sim, fps):
 
     plt.tight_layout()
     ani.save("boids.gif", writer="pillow")
-
-
-if __name__ == "__main__":
-    print("main namespace")
-    main(100, 10)
-    print("main() done.")
