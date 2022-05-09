@@ -1,8 +1,9 @@
 import numpy as np
 # from actors import Actor, Boid  # QU: What is module Actor needed for? TBD in future?
 from actors import Boid
+from itertools import count
 import matplotlib.pyplot as plt
-from matplotlib.animation import ArtistAnimation
+from matplotlib.animation import FuncAnimation
 
 
 class Simulation:
@@ -33,7 +34,7 @@ class Simulation:
 
     def run(self, steps, dt):
         # ani: t=0
-        for i in range(steps):
+        for i in range(steps):  # ani: change to while True loop? break if window closed?
             self.step(dt)
             # ani: t+=dt
 
@@ -43,10 +44,44 @@ class Simulation:
             # needed for animation: actor.pos, actor.v
 
 
-def main():
+def animate(i, ani, dt_animate):
+    boids = ani.actors
+
+    # plt.cla()  # clear axis, if axis should change
+
+    for boid in boids:
+        xp = boid.pos[0]
+        yp = boid.pos[1]
+        xv = boid.v[0]
+        yv = boid.v[1]
+        plt.plot([xp, xp+xv], [yp, yp+yv], c="black", ls="-")
+        # could also first create one np.array of all boids and call plt.plot() once for whole array
+
+    plt.tight_layout()
+
+    ani.run(1, dt_animate)
+
+
+def main(N=10, fps=1):
+    index = count()
+
     sim = Simulation()
-    sim.setup(10)
-    sim.run(10, 1)
+    sim.setup(N)
+
+    dt_main = fps/1000
+    ani = FuncAnimation(plt.gcf(), animate(index, sim, dt_main), interval=dt_main)
+    # QU: how to pass additional functions to animate()? Investigate FuncAnimation doc.
+
+    plt.tight_layout()
+    # TypeError: 'NoneType' object is not callable
+    # probably the animate(.,.,.) call inside the FuncAnimation(.,.,.) call assigned to 'ani'
+
+    plt.show()
+
+    # ani: incorporate sim.run() into the animate() function
+    # sim = Simulation()
+    # sim.setup(10)
+    # sim.run(10, 1)
 
 
 if __name__ == "__main__":

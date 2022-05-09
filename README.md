@@ -31,13 +31,29 @@ Nail down the project topic and description. It's no problem to completely chang
 
 If boids is the way to go:
 
-- animation: interactive sliders for input parameters (like field of view (FOW) angle, cohesion strength, etc.), mouse interface would be nice to have already maybe to play around and explore possibilities.
+- `Boid` class: TBD: testing flocking behaviour with animation
+
+- animation: TBD (make things work) interactive sliders for input parameters (like field of view (FOW) angle, cohesion strength, etc.), mouse interface would be nice to have already maybe to play around and explore possibilities.
   - show a boid as a pointy triangle
   - boids have velocity vectors
     - () acceleration vectors could be interesting, showing where the boid wants to go
+
+
 - pygame, good start: [some yt video](https://www.youtube.com/watch?v=cFq3dKa6q0o), pygame looks quite simple to get up and running, compared to matplotlib (use `pip install pygame` in the boid conda env on windows to install without error (version 2.1.2 or so)).
 
-- `Boid` class: <Jacqueline>
+
+- **[matplotlib.animation.ArtistAnimation](https://matplotlib.org/stable/api/_as_gen/matplotlib.animation.ArtistAnimation.html) Animation using a fixed set of Artist objects. - *not suitable*** for our purpose (unfortunately what I am more familiar with).
+- **[matplotlib.animation.FuncAnimation](https://matplotlib.org/stable/api/_as_gen/matplotlib.animation.FuncAnimation.html#matplotlib.animation.FuncAnimation) makes an animation by repeatedly calling a function func. - suitable for endless live interactive animation.**
+- [nice yt tutorial](https://www.youtube.com/watch?v=Ercd-Ip5PfQ)
+
+
+- [matplotlib interactive functions](https://matplotlib.org/stable/gallery/event_handling/ginput_manual_clabel_sgskip.html)
+- [matplotlib animation doc. page](https://matplotlib.org/stable/gallery/index.html#animation)
+- [interactive figures](https://matplotlib.org/stable/users/explain/interactive.html) sounds promising
+  - "For the figures to be responsive to mouse, keyboard, and paint events, the GUI event loop needs to be integrated with an interactive prompt. We recommend using IPython (scroll down in website)."
+  - "PyCharm, Spyder, and VSCode: Many IDEs have built-in integration with Matplotlib, please consult their documentation for configuration details."
+
+
 
 ### things to discuss
 
