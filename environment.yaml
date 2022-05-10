@@ -1,0 +1,10 @@
+name: boid
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - matplotlib
+  - ipykernel
+  - numba
+prefix: C:\Users\Dancer\anaconda3\envs\boid
