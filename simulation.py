@@ -1,6 +1,6 @@
 import numpy as np
 from actors import Boid
-import animation
+import animation_mpl
 
 
 class Simulation:
