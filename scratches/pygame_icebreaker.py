@@ -7,7 +7,7 @@ import pygame
 pygame.init()
 
 size = width, height = 1028, 720  # size = (width,height) = 320,420
-speed = [2, 2]
+speed = [1, 1]
 black = 0, 0, 0
 
 # Pygame represents images as Surface objects.
@@ -34,4 +34,4 @@ while 1:  # while True
     screen.fill(black)
     screen.blit(ball, ballrect)
 
-    pygame.display.flip()
+    pygame.display.flip()  # somehow makes the ball appear...?

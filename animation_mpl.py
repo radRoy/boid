@@ -29,8 +29,7 @@ def main(simulation, fps):
     # frames = <number of total frames to animate>
 
     plt.tight_layout()
-    #ani.save("boids_vel.gif", writer="pillow")  # This step takes very long - wihtout it, runtime < 1sec
-    plt.show()
+    ani.save("boids_vel.gif", writer="pillow")  # This step takes very long - wihtout it, runtime < 1sec
 
 
 if __name__ == "__main__":
