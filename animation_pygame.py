@@ -16,11 +16,13 @@ import numpy as np
 
 
 def get_actors_positions(sim: s.Simulation):
-    """get Simulation.actors' positions and return as numpy array"""
-    xys = np.full((len(sim.actors), 2), .0)
-    for i, actor in enumerate(sim.actors):
-        xys[i] = np.array([actor.pos[0], actor.pos[1]])
-    return xys
+    """get Simulation.actors' positions and return as numpy array."""
+    return np.array([boid.pos for boid in sim.actors])
+
+
+def get_rects_positions(rects: list):
+    """get rects' positions and return as numpy array. rects: list of pygame Rect objects"""
+    return np.array([[rect.x, rect.y] for rect in rects])
 
 
 def get_zoom(xys: np.ndarray, size: tuple, screen_coverage: float = .5):
@@ -38,20 +40,17 @@ def get_zoom(xys: np.ndarray, size: tuple, screen_coverage: float = .5):
 
 
 def get_transposition(xys: np.ndarray, size: tuple):
-    """returns transposition/-location (linear transformation) vector,
-    for a flock of Actors to be centered in the (static) pygame.display"""
-    display_centre = np.array([size[0] // 2, size[1] // 2])  # centre of the pygame.display
-    # flock_median_pos = np.array(np.median(xys[:, 0]), np.median(xys[:, 1]))
+    """returns transposition/-location (linear transformation) vector, for a flock of Actors to be centered in the (static) pygame.display"""
+    display_centre = np.array([size[0] // 2, size[1] // 2])
     flock_mean_pos = np.array(np.mean(xys[:, 0]), np.mean(xys[:, 1]))
-    # return display_centre - flock_mean_pos
-    return 0 - flock_mean_pos
+    return display_centre - flock_mean_pos
 
 
 def main(sim: s.Simulation, fps: int) -> None:
     """the function in charge of handling all function calls regarding the live animation interface and display"""
     dt = fps / 1000
     actors = sim.actors
-    rects = []
+    n_boids = len(actors)
 
     pg.init()  # multiple .init()s don't hurt pygame
     # pg.camera.init()
@@ -62,31 +61,31 @@ def main(sim: s.Simulation, fps: int) -> None:
     size = (res_x, res_y) = 720, 720
     # pg.display.get_desktop_sizes()  # useful to run program on other devices (e.g. multi-devs or .exe running)
     # can use hardware acceleration if toggling pygame's fullscreen mode on ('flags' in .set_mode())
-    screen = pg.display.set_mode(size)
+    display = pg.display.set_mode(size)
     # https://www.pygame.org/docs/ref/display.html - .set_mode() seems able to do automatic scaling & tracking
 
-    # black = 0, 0, 0
-    white = 255, 255, 255
+    white = 255, 255, 255  # black = 0, 0, 0
     background = white
-    # TBD: add a grid for position tracking in moving screen
-    # IDEA: could use mpl.pyplot for creating .png of resolution adapted to pygame.get_desktop_size(), procedural
+    # TBD: add a grid for position tracking in moving display
+    # idea: could use mpl.pyplot for creating .png of resolution adapted to pygame.get_desktop_size(), procedural
 
-    # CALCULATE initial zoom & transposition
-    # xys = get_actors_positions(sim)
-    # zoom = get_zoom(xys, size, .5)
-    # transpose = get_transposition(xys, size)
+    # init rect positions
 
-    # INIT RECTS POSITIONS (& init frame, not required for ani. to work)
     arrow = pg.image.load("arrowhead_upwards_tiny.png")
-    screen.fill(background)
+    arrow_rect = arrow.get_rect()
+    display.fill(background)
     temp_zoom = 50
-    # print((zoom * xys + transpose)[0])  # TBD: have to apply these operations to the Rect objects after .move()
-    for i, boid in enumerate(actors):
-        rect = arrow.get_rect()  # TBD: configure .get_rect() to return centre instead of (leftupper) corner coordinates
-        rect = rect.move([boid.pos[0] * temp_zoom, boid.pos[1] * temp_zoom])
-        rects.append(rect)
-        screen.blit(arrow, rect)  # look into .blits() for one-liner of multi-Surface animation
-    pg.display.update()  # more efficient & capable version of .display.flip() (flip() must do vsync, update() can)
+
+    xys = get_actors_positions(sim)
+    zoom = get_zoom(xys, size)
+    transposition = get_transposition(xys, size)
+    xys = (xys + transposition) * zoom  # xys * zoom + transpose = (xys + transpose) * zoom ?
+
+    rects = [arrow.get_rect().move(xy) for xy in xys]
+
+    for rect in rects:
+        display.blit(arrow, rect)
+    pg.display.update()  # better than display.flip() (faster & does more)
 
     while True:
         for event in pg.event.get():
@@ -95,22 +94,24 @@ def main(sim: s.Simulation, fps: int) -> None:
                 # pg.camera.Camera.stop()  # .start() not found
                 sys.exit()
 
-        # UPDATE Simulation()
+        # update simulation
         sim.step(dt)  # = sim.run(steps=1, dt=dt)
 
-        # CALCULATE zoom & transposition
-        # xys = get_actors_positions(sim)
-        # zoom = get_zoom(xys, size, .5)
-        # transpose = get_transposition(xys, size)
+        # update display
+        # display.fill(background)  # comment out to see movement trajectories
 
-        # UPDATE DISPLAY
-        # screen.fill(background)  # comment out to see movement trajectories
-        for i, rect in enumerate(rects):
-            boid = actors[i]
-            # rect = rect.move(boid.pos)  # boids overlap, currently
-            rect = rect.move([boid.pos[0] * temp_zoom, boid.pos[1] * temp_zoom])  # boids don't overlap
-            screen.blit(arrow, rect)
-        pg.display.update()
+        xys = get_actors_positions(sim)
+        zoom = get_zoom(xys, size)
+        transposition = get_transposition(xys, size)
+        xys = (xys + transposition) * zoom  # xys * zoom + transpose = (xys + transpose) * zoom ?
+
+        rects = [arrow.get_rect().move(xy) for xy in xys]
+
+        for rect in rects:
+            display.blit(arrow, rect)
+        pg.display.update()  # better than display.flip() (faster & does more)
+
+        break
 
 
 if __name__ == "__main__":
