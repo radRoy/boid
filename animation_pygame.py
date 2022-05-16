@@ -57,6 +57,9 @@ def main(sim: s.Simulation, fps: int) -> None:
     n_boids = len(actors)
 
     pg.init()  # multiple .init()s don't hurt pygame
+
+    # %% first frame
+
     """# pg.camera.init()
     # pg.camera.init('_camera (MSMF)')
     # neither cameras make ..Camera.start() work (not found)
@@ -90,6 +93,9 @@ def main(sim: s.Simulation, fps: int) -> None:
     #     display.blit(surf, surfrect)
     # pg.display.update()  # better than display.flip() (faster & does more)
     """
+
+    # %%
+
     while True:
         for event in pg.event.get():
             # print(f"event = {event}")  # registers keyboard & mouse inputs & cursor location with or without usage
@@ -97,13 +103,13 @@ def main(sim: s.Simulation, fps: int) -> None:
                 # pg.camera.Camera.stop()  # .start() not found
                 sys.exit()
 
-        sim.step(dt)  # = sim.run(steps=1, dt=dt)
+        sim.step(dt)
         display.fill(background)  # comment out for trajectories
 
         xys = get_actors_positions(sim)
         zoom = get_zoom(xys, size)
         transposition = get_transposition(xys * zoom, size)
-        xys = xys * zoom + transposition # xys * zoom + transpose = (xys + transpose) * zoom ?
+        xys = xys * zoom + transposition
 
         surfrect_list = [surfrect0.move(xy) for xy in xys]
 
