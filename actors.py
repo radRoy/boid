@@ -1,23 +1,58 @@
 from vectors2d import Vector
+from obstacles import Circle, Wall
 
 
 class Actor:
     """The base class for all actors. Actors can move and be seen by other actors."""
 
-    def __init__(self, position, velocity, speed, view_distance, view_angle):
+    def __init__(self, simulation, position, velocity, speed, view_distance, view_angle):
+        self.sim = simulation
         self.pos = Vector(position[0], position[1])
         self.v = Vector(velocity[0], velocity[1])
         self.speed = float(speed)
         self.view_dist = float(view_distance)  # how far the actor can see
         self.view_angle = float(view_angle)  # in radians
+        self.ahead = self.pos + self.v.normalize() * self.view_dist
 
-    def move(self, dt):
+    def update(self, dt):
         self.pos += self.v * dt
+        self.ahead = self.pos + self.v.normalize() * self.view_dist
 
     def apply_force(self, force, dt):
         self.v += force * dt
         # scale the velocity to the desired speed (currently constant speed)
-        self.v = self.v.normalize()*self.speed
+        self.v = self.v.normalize() * self.speed
+
+    def calc_avoidance(self, strength):
+        small_ahead = self.ahead * 0.5
+        threat = None
+        threat_dist = self.view_dist
+
+        for obstacle in self.sim.obstacles:
+            if obstacle is Circle:
+                close_dist = small_ahead.distance_sq_to(obstacle.pos)
+                far_dist = self.ahead.distance_sq_to(obstacle.pos)
+                if close_dist <= obstacle.rad_sq or far_dist <= obstacle.rad_sq:
+                    dist = self.pos.distance_to(obstacle.pos)
+                    if dist < threat_dist:
+                        threat = obstacle
+                        threat_dist = dist
+
+            if obstacle is Wall:
+                dist = obstacle.distance_to(self.pos)**2
+                if dist < threat_dist:
+                    if obstacle.intersects(self.pos, ahead):
+                        threat = obstacle
+                        threat_dist = dist
+
+        if threat is Circle:
+            avoidance = (self.ahead - threat.pos).normalize() * strength
+            return avoidance
+        elif threat is Wall:
+            avoidance = (self.ahead - threat.pos).normalize() * strength
+            return avoidance
+        else:
+            return Vector(0, 0)
 
     def in_fov(self, point):
         """Checks if a given point is in the field of view"""
@@ -29,10 +64,16 @@ class Actor:
 class Boid(Actor):
     """Boid class."""
 
-    def __init__(self, position, velocity, speed, view_distance, view_angle, flock):
-        Actor.__init__(self, position, velocity, speed, view_distance, view_angle)
+    def __init__(self, simulation, position, velocity, speed, view_distance, view_angle, flock):
+        Actor.__init__(self, simulation, position, velocity, speed, view_distance, view_angle)
         self.neighbors = []
         self.flock = flock
+
+    def update(self, dt):
+        Actor.update(self, dt)
+        self.get_neighbors()
+        force = self.calc_forces(2, 1, 1, 1)
+        self.apply_force(force, dt)
 
     def get_neighbors(self):
         """Gets all the neighbors that are visible to the boid."""
@@ -43,13 +84,14 @@ class Boid(Actor):
             elif self.pos.distance_to(member.pos) <= self.view_dist ** 2 and self.in_fov(member.pos):
                 self.neighbors.append(member)
 
-    def calc_forces(self, separation_strength, alignment_strength, cohesion_strength):
+    def calc_forces(self, separation_strength, alignment_strength, cohesion_strength, avoidance_strength):
         """Calculates all the flocking forces."""
         separation = self.calc_separation(separation_strength)
         alignment = self.calc_alignment(alignment_strength)
         cohesion = self.calc_cohesion(cohesion_strength)
+        avoidance = self.calc_avoidance(avoidance_strength)
 
-        return separation + alignment + cohesion
+        return separation + alignment + cohesion + avoidance
 
     def calc_separation(self, strength, rad_sq=0.1):
         if not self.neighbors:
@@ -96,7 +138,7 @@ class Boid(Actor):
         for neighbor in self.neighbors:
             avg_position += neighbor.pos
 
-        avg_position /= len(self.neighbors) + 1 # the average position every neighbor has (including self)
+        avg_position /= len(self.neighbors) + 1  # the average position every neighbor has (including self)
 
         cohesion = (avg_position - self.pos).normalize() * strength
         return cohesion

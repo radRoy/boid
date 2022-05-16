@@ -79,4 +79,22 @@ class Vector(tuple):
     def angle_to(self, point):
         """Returns the smallest, unsigned angle to a given point."""
         dot_prod = self.normalize().dot(point.normalize())
-        return math.acos(dot_prod)
+        try:
+            return math.acos(dot_prod)
+        except ValueError:
+            if dot_prod >= 1:
+                return math.acos(1)
+            if dot_prod <= -1:
+                return math.acos(-1)
+
+    def orthogonal(self):
+        """Always returns the orthogonal vector pointing to the right of the original vector."""
+        return Vector(self.y, -self.x)
+
+    def orthonormal(self):
+        """Always returns the orthonormal vector (with length 1) pointing to the right of the original vector."""
+        return self.orthogonal().normalize()
+
+    def cross(self, other):
+        return self.x * other.y - self.y * other.x
+

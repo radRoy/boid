@@ -1,11 +1,13 @@
 import numpy as np
 from actors import Boid
+from obstacles import Obstacle, Circle, Wall
 import animation
 
 
 class Simulation:
     def __init__(self):
         self.actors = []  # the list to animate for each frame (see Simulation.run())
+        self.obstacles = []
 
     def setup(self, nboids):
         # Create random positions and velocities
@@ -16,7 +18,8 @@ class Simulation:
 
         # Populate the actors with new boids
         for i in range(nboids):
-            new = Boid(position=positions[i],
+            new = Boid(simulation=self,
+                       position=positions[i],
                        velocity=velocities[i],
                        speed=1,
                        view_distance=2,
@@ -33,16 +36,16 @@ class Simulation:
 
     def step(self, dt):
         for actor in self.actors:
-            actor.move(dt)  # currently, velocity is constant
-            actor.get_neighbors()
-            force = actor.calc_forces(2, 1, 1)
-            actor.apply_force(force, dt)
+            actor.update(dt)  # currently, velocity is constant
             # needed for animation: actor.pos, actor.v
 
 
-def main(N=50, fps=10):
+def main(N=20, fps=1):
+    test = Circle((0, 0), 0.2)
+
     sim = Simulation()
     sim.setup(N)  # N boids (flock, no pred. currently)
+    sim.obstacles.append(test)
     animation.main(sim, fps)
 
 

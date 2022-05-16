@@ -4,6 +4,7 @@ from matplotlib.animation import FuncAnimation
 
 def animate(i, sim, dt_animate):
     boids = sim.actors
+    obstacles = sim.obstacles
 
     plt.clf()  # clear axis, if axis should change
 
@@ -16,16 +17,26 @@ def animate(i, sim, dt_animate):
         plt.scatter(xp, yp, c="black")
         plt.plot([xp, xp+xv], [yp, yp+yv], color="black")
 
+    for obstacle in obstacles:
+        obstacle.plot(plt)
+
     plt.tight_layout()
     sim.run(1, dt_animate)
 
 
 def main(sim, fps):
+    # create a figure with matplotlib
+    # fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+    #
+    # # force equal aspect ratio
+    # ax.set_aspect("equal")
+    #
+    # # grid overlay
+    # ax.grid(False)
 
     dt_main = 1/fps
-    wait_duration = 1000/fps
 
-    ani = FuncAnimation(plt.gcf(), animate, frames=200, fargs=(sim, dt_main,), interval=wait_duration)
+    ani = FuncAnimation(plt.gcf(), animate, frames=200, fargs=(sim, dt_main))
     # frames = <number of total frames to animate>
 
     plt.tight_layout()
