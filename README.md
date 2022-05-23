@@ -38,6 +38,10 @@ animation:
 
 ## Talk (Presentation)
 15-20 minutes talk seems appropriate.
+- Take your time for the introduction!
+- Technicalities in the middle should take up less time ~.
+- Where did we stumble? Why?
+- Take your time for the conclusion!
 
 ### 1. Aufgabenstellung und Motivation
 How can complex behaviours like swarming/flocking in swallows or herding in sheep arise?
