@@ -41,6 +41,12 @@ class Vector(tuple):
     def __truediv__(self, other):
         return Vector(self.x / other, self.y / other)
 
+    def __setitem__(self, key, value):
+        if key == 0:
+            return Vector(value, self.y)
+        elif key == 1:
+            return Vector(self.x, value)
+
     def length_sq(self):
         """Returns the squared length (magnitude) of the vector."""
         return (self.x * self.x) + (self.y * self.y)
