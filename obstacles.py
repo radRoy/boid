@@ -19,7 +19,6 @@ class Circle(Obstacle):
     def __init__(self, position, radius):
         Obstacle.__init__(self, position)
         self.rad = radius
-        self.rad_sq = radius ** 2
 
 
 class Wall(Obstacle):

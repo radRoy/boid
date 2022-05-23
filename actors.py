@@ -1,15 +1,25 @@
 from vectors2d import Vector
 from obstacles import Circle, Wall
+import math
+
+avoidance_strength = 1.0
+separation_strength = 1.0
+separation_radius = 1.0
+alignment_strength = 1.0
+cohesion_strength = 1.0
 
 
 class Actor:
     """The base class for all actors. Actors can move and be seen by other actors."""
 
-    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass=1, color=(0, 0, 0)):
+    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color):
         self.sim = simulation
 
         self.pos = Vector(position[0], position[1])  # position
-        self.v = Vector(velocity[0], velocity[1]).normalize() * max_speed  # velocity
+        self.direction = Vector(velocity[0], velocity[1]).normalize()
+        self.dir_history = [self.direction] * 10
+        self.v = self.direction * max_speed  # velocity
+        self.speed = max_speed
         self.forces = Vector(0, 0)  # sum of all forces on the actor this frame
         self.max_speed = float(max_speed)  # the maximum speed the actor can travel at
 
@@ -20,23 +30,39 @@ class Actor:
         self.mass = mass  # influences
         self.color = color  # color for display
 
-        self.debug_avoidance = Vector(0, 0)
-
     def update(self, dt):
         """Updates all the actor attributes. Call this every frame after calculating all the forces."""
-        self.forces += self.calc_avoidance(100)
+        self.forces += self.calc_avoidance()
         acceleration = self.forces / self.mass
+
         self.v += acceleration * dt  # update the velocity
-        self.forces = Vector(0, 0)  # reset all the forces after applying them
+
+        self.speed = self.v.length()
 
         # Clamp the velocity at maximum speed
-        if self.v.length() > self.max_speed:
+        if self.speed > self.max_speed:
             self.v = self.v.normalize() * self.max_speed
+            self.speed = self.max_speed
+
+        self.direction = self.v.normalize()
+
+        del self.dir_history[0]
+        self.dir_history.append(self.direction)
+
+        self.forces = Vector(0, 0)  # reset all the forces after applying them
 
         self.pos += self.v * dt  # update the position
         self.ahead = 50 * self.v * dt  # update the ahead vector
 
-    def calc_avoidance(self, strength):
+        self.change_color()
+
+    def change_color(self):
+        red_val = self.speed / self.max_speed * 255
+        blue_val = (1 - self.speed / self.max_speed) * 255
+
+        self.color = (red_val, 0, blue_val)
+
+    def calc_avoidance(self):
         small_ahead = self.ahead / 2
         threat = None
         threat_dist = None
@@ -58,18 +84,12 @@ class Actor:
                         threat_dist = dist
 
         if type(threat) is Wall:
-            avoidance = (threat.orthonormal_vector_to(self.pos)) * strength / threat_dist
-            self.color = (0, 0, 255)
-            self.debug_avoidance = Vector(0, 0)
+            avoidance = (threat.orthonormal_vector_to(self.pos)) * avoidance_strength / threat_dist
             return avoidance
         elif type(threat) is Circle:
-            avoidance = (self.pos - threat.pos).normalize() * strength / threat_dist
-            self.debug_avoidance = avoidance
-            self.color = (255, 0, 0)
+            avoidance = (self.pos - threat.pos).normalize() * avoidance_strength / threat_dist
             return avoidance
         else:
-            self.debug_avoidance = Vector(0, 0)
-            self.color = (0, 0, 0)
             return Vector(0, 0)
 
     def in_fov(self, point):
@@ -82,14 +102,14 @@ class Actor:
 class Boid(Actor):
     """Boid class."""
 
-    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass=1, color=(0, 0, 0), flock=None):
+    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color, flock):
         Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
         self.flock = flock  # all other boids in the simulation
         self.neighbors = []  # all boids that are close
 
     def update(self, dt):
         self.get_neighbors()
-        self.forces += self.calc_flocking(4, 1, 1)
+        self.forces += self.calc_flocking()
         Actor.update(self, dt)
 
     def get_neighbors(self):
@@ -101,15 +121,15 @@ class Boid(Actor):
             elif self.pos.distance_to(member.pos) <= self.view_dist ** 2 and self.in_fov(member.pos):
                 self.neighbors.append(member)
 
-    def calc_flocking(self, separation_strength, alignment_strength, cohesion_strength):
+    def calc_flocking(self):
         """Calculates all the flocking forces."""
-        separation = self.calc_separation(separation_strength)
-        alignment = self.calc_alignment(alignment_strength)
-        cohesion = self.calc_cohesion(cohesion_strength)
+        separation = self.calc_separation()
+        alignment = self.calc_alignment()
+        cohesion = self.calc_cohesion()
 
         return separation + alignment + cohesion
 
-    def calc_separation(self, strength, rad=20):
+    def calc_separation(self):
         """Calculate the separation force of the boids which makes them keep a minimum distance from each other."""
         if not self.neighbors:
             return Vector(0, 0)
@@ -119,7 +139,7 @@ class Boid(Actor):
 
         for neighbor in self.neighbors:
             distance = self.pos.distance_to(neighbor.pos)  # distance to the neighbor
-            if distance <= rad:
+            if distance <= separation_radius:
                 close_neighbors += 1
                 # we divide by distance such the separation force is stronger for closer neighbors.
                 avg_evasion += (self.pos - neighbor.pos) / distance  # vector pointing away from the neighbor
@@ -129,10 +149,10 @@ class Boid(Actor):
         else:
             avg_evasion /= close_neighbors
 
-        separation = avg_evasion.normalize() * strength
+        separation = avg_evasion.normalize() * separation_strength
         return separation
 
-    def calc_alignment(self, strength):
+    def calc_alignment(self):
         """Calculate the alignment force of the boids which makes them align their velocity vectors."""
         if not self.neighbors:
             return Vector(0, 0)
@@ -144,7 +164,7 @@ class Boid(Actor):
 
         avg_direction /= len(self.neighbors) + 1  # the average direction every neighbor is facing (including self)
 
-        alignment = avg_direction.normalize() * strength
+        alignment = avg_direction.normalize() * alignment_strength
         return alignment
 
     def calc_cohesion(self, strength):
@@ -159,5 +179,5 @@ class Boid(Actor):
 
         avg_position /= len(self.neighbors) + 1  # the average position every neighbor has (including self)
 
-        cohesion = (avg_position - self.pos).normalize() * strength
+        cohesion = (avg_position - self.pos).normalize() * cohesion_strength
         return cohesion
