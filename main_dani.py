@@ -86,7 +86,10 @@ def main(sim, fps, window_size):
 
 
 if __name__ == "__main__":
-    sim_test = Simulation((720, 720))
+    res = (x, y) =\
+    1280,\
+    720
+    sim_test = Simulation(res)
     sim_test.setup(nboids=50)
 
-    main(sim=sim_test, fps=30, window_size=(720, 720))
+    main(sim=sim_test, fps=30, window_size=res)
