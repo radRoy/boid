@@ -24,7 +24,12 @@ class Simulation:
         bottom_wall = Wall((self.window_size[0], self.window_size[1]), (0, self.window_size[1]))
         left_wall = Wall((0, self.window_size[1]), (0, 0))
 
-        self.obstacles.extend([top_wall, right_wall, bottom_wall, left_wall])
+        random_wall1 = Wall((np.random.uniform(0, self.window_size[0]), np.random.uniform(0, self.window_size[1])),
+                            (np.random.uniform(0, self.window_size[0]), np.random.uniform(0, self.window_size[1])))
+        random_wall2 = Wall((np.random.uniform(0, self.window_size[0]), np.random.uniform(0, self.window_size[1])),
+                            (np.random.uniform(0, self.window_size[0]), np.random.uniform(0, self.window_size[1])))
+
+        self.obstacles.extend([top_wall, right_wall, bottom_wall, left_wall, random_wall1, random_wall2])
 
         flock = []
         # Populate the actors with new boids

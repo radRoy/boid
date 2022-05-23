@@ -40,40 +40,31 @@ class Actor:
         threat_dist = None
 
         for obstacle in self.sim.obstacles:
-            if type(obstacle) is Circle:
-                close_dist = (self.pos + small_ahead).distance_to(obstacle.pos)
-                far_dist = (self.pos + self.ahead).distance_to(obstacle.pos)
-                dist = self.pos.distance_to(obstacle.pos)
-                if close_dist <= obstacle.rad or far_dist <= obstacle.rad or dist <= obstacle.rad:
-                    if threat_dist is None or dist < threat_dist:
-                        threat = obstacle
-                        threat_dist = dist
-
             if type(obstacle) is Wall:
                 dist = obstacle.distance_to(self.pos)
                 if threat_dist is None or dist < threat_dist:
                     if obstacle.intersects(self.pos, self.ahead):
                         threat = obstacle
                         threat_dist = dist
+            elif type(obstacle) is Circle:
+                dist = self.pos.distance_to(obstacle.pos)
+                if threat_dist is None or dist < threat_dist:
+                    close_dist = (self.pos + small_ahead).distance_to(obstacle.pos)
+                    far_dist = (self.pos + self.ahead).distance_to(obstacle.pos)
+                    if close_dist <= obstacle.rad or far_dist <= obstacle.rad or dist <= obstacle.rad:
+                        threat = obstacle
+                        threat_dist = dist
 
-        if type(threat) is Circle:
-            avoidance = (self.pos + self.ahead - threat.pos).normalize() * strength / threat_dist
-            self.color = (255, 0, 0)
-            self.debug_avoidance = avoidance
-            return avoidance
-        elif type(threat) is Wall:
-            if threat_dist < 0.001:
-                self.pos += threat.orthonormal_vector_to(self.pos) * 0.002
-                threat_dist = 0.002
-                print(f"I was teleported to position: {self.pos}")
-
+        if type(threat) is Wall:
             avoidance = (threat.orthonormal_vector_to(self.pos)) * strength / threat_dist
             self.color = (0, 0, 255)
-            self.debug_avoidance = avoidance
+            return avoidance
+        elif type(threat) is Circle:
+            avoidance = (self.pos + self.ahead - threat.pos).normalize() * strength / threat_dist
+            self.color = (255, 0, 0)
             return avoidance
         else:
             self.color = (0, 0, 0)
-            self.debug_avoidance = Vector(0, 0)
             return Vector(0, 0)
 
     def in_fov(self, point):
