@@ -17,43 +17,23 @@ Useful links:
 algorithms:
 - flocking behaviour works well
 - efficient computation
+- obstacle avoidance (incl. coundary conditions)
 
 live animation
-- working `Boid`-`FuncAnimation` interface
-- live velocity vectors
-- post animation (not live but rendering after simulation (in post))
+- live pygame animation
+- rotating boids
+- proxy of current velocity implemented? (stretching boid icons?)
+- pygame plotting solved?
 
-## To Be Done (TODO, TBD)
-flocking:
-- parameter herumpsielen & optimieren
-- obstacle avoidance
-- boundary conditions
-
-live animation:
-for now, use [matplotlib](https://matplotlib.org/stable/users/explain/interactive.html?highlight=interactive) (! IPython recommended !)
-- [matplotlib animation doc. page](https://matplotlib.org/stable/gallery/index.html#animation)
-- animation fix (loading time, live updates, interactive sliders, key & mouse inputs)
-  - [matplotlib.widget example (sliders)](https://matplotlib.org/stable/gallery/widgets/slider_demo.html#sphx-glr-gallery-widgets-slider-demo-py)
-  - NFG (for matplotlib): pycharm, spyder
-  - works with matplotlib: Anaconda prompt (CLI), IPython? (recommended by matplotlib docs)
-    - [IPython: reference & notes about matplotlib](https://ipython.org/ipython-doc/stable/interactive/reference.html#plotting-with-matplotlib)
-- boids = arrows
-  - [matplotlib self-making markerstyle](https://matplotlib.org/stable/gallery/shapes_and_collections/arrow_guide.html)
-  - quiver plots work as scatter plots, too, it turns out.
-  - last resort fall-back: draw arrows in plt.plot() command (ugly solution)
-- sliders (e.g., FOW angle, cohesion strength, obstacle avoidance)
+## To Be Done
+animation:
+- live parameter sliders
 - mouse interface
-- boids = triangles
-- boids have velocity
-- ()boids have acceleration vectors, visualising boids' intentions
+- ()boids have acceleration vectors, visualising boids' intention
 
-## Let's talk about it
+## Discuss / Possibilities
 - numba.jit optimisation (see the [Deprecation Notices](https://numba.pydata.org/numba-doc/latest/reference/deprecation.html?highlight=list%20deprecation) of the Numba documentation page
-  - will not use unless really necessary
-- conda python environment:
-  - python 3.9
-  - [conda environments](https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html): You can also share your environment with someone by giving them a copy of your `environment.yaml` file.
-  - [conda: managing environments](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
+  - necessary with nboids > 50 (fps aim 30 stable)
 
 ## Talk (Presentation)
 15-20 minutes talk seems appropriate.
