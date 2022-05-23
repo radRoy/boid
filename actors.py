@@ -20,6 +20,8 @@ class Actor:
         self.mass = mass  # influences
         self.color = color  # color for display
 
+        self.debug_avoidance = Vector(0, 0)
+
     def update(self, dt):
         """Updates all the actor attributes. Call this every frame after calculating all the forces."""
         self.forces += self.calc_avoidance(100)
@@ -58,12 +60,15 @@ class Actor:
         if type(threat) is Wall:
             avoidance = (threat.orthonormal_vector_to(self.pos)) * strength / threat_dist
             self.color = (0, 0, 255)
+            self.debug_avoidance = Vector(0, 0)
             return avoidance
         elif type(threat) is Circle:
-            avoidance = (self.pos + self.ahead - threat.pos).normalize() * strength / threat_dist
+            avoidance = (self.pos - threat.pos).normalize() * strength / threat_dist
+            self.debug_avoidance = avoidance
             self.color = (255, 0, 0)
             return avoidance
         else:
+            self.debug_avoidance = Vector(0, 0)
             self.color = (0, 0, 0)
             return Vector(0, 0)
 

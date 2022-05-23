@@ -35,6 +35,8 @@ def main(sim: Simulation, fps: int) -> None:
             right = actor.pos - direction*10 - direction.orthonormal()*2
             pg.draw.polygon(display, actor.color, points=[actor.pos, left, right])
 
+            pg.draw.line(display, RED, actor.pos, actor.pos+actor.debug_avoidance*10, 1)
+
         for obstacle in sim.obstacles:
             if type(obstacle) is Wall:
                 pg.draw.line(display, BLUE, obstacle.start, obstacle.stop, 10)
