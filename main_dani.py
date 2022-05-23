@@ -42,16 +42,35 @@ def main(sim, fps, window_size):
     sep_slider = Slider(display, s_left, s_top, s_width, s_height, min=0.0, max=10.0, step=.1)
     sep_out = TextBox(display, t_left, t_top, 0, t_height, fontSize=fontsize, borderThickness=1)
     sep_label = TextBox(display, s_left, s_top + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText("separation")
-
     coh_slider = Slider(display, s_left, s_top + s_dist, s_width, s_height, min=0.0, max=10.0, step=.1)
     coh_out = TextBox(display, t_left, t_top + s_dist, 0, t_height, fontSize=fontsize, borderThickness=1)
     coh_label = TextBox(display, s_left, s_top + s_dist + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText("coherence")
-
     align_slider = Slider(display, s_left, s_top + s_dist * 2, s_width, s_height, min=0.0, max=10.0, step=.1)
     align_out = TextBox(display, t_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1)
     align_label = TextBox(display, s_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1).setText("alignment")
+    maxvel_slider = Slider(display, s_left, s_top + s_dist * 4, s_width, s_height, min=0.0, max=10.0, step=.1)
+    maxvel_out = TextBox(display, t_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize, borderThickness=1)
+    maxvel_label = TextBox(display, s_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize, borderThickness=1).setText("slider 4")
+    slider_5 = Slider(display, s_left, s_top + s_dist * 5, s_width, s_height, min=0.0, max=10.0, step=.1)
+    slider_5_out = TextBox(display, t_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize, borderThickness=1)
+    slider_5_label = TextBox(display, s_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize, borderThickness=1).setText("slider 5")
+    # slider_6 = Slider(display, s_left, s_top + s_dist * 6, s_width, s_height, min=0.0, max=10.0, step=.1)
+    # slider_6_out = TextBox(display, t_left, t_top + s_dist * 6, 0, t_height, fontSize=fontsize, borderThickness=1)
+    # slider_6_label = TextBox(display, s_left, t_top + s_dist * 6, 0, t_height, fontSize=fontsize, borderThickness=1).setText("slider 6")
+    # slider_7 = Slider(display, s_left, s_top + s_dist * 7, s_width, s_height, min=0.0, max=10.0, step=.1)
+    # slider_7_out = TextBox(display, t_left, t_top + s_dist * 7, 0, t_height, fontSize=fontsize, borderThickness=1)
+    # slider_7_label = TextBox(display, s_left, t_top + s_dist * 7, 0, t_height, fontSize=fontsize, borderThickness=1).setText("slider 7")
+    # slider_8 = Slider(display, s_left, s_top + s_dist * 8, s_width, s_height, min=0.0, max=10.0, step=.1)
+    # slider_8_out = TextBox(display, t_left, t_top + s_dist * 8, 0, t_height, fontSize=fontsize, borderThickness=1)
+    # slider_8_label = TextBox(display, s_left, t_top + s_dist * 8, 0, t_height, fontSize=fontsize, borderThickness=1).setText("slider 8")
+    # slider_9 = Slider(display, s_left, s_top + s_dist * 9, s_width, s_height, min=0.0, max=10.0, step=.1)
+    # slider_9_out = TextBox(display, t_left, t_top + s_dist * 9, 0, t_height, fontSize=fontsize, borderThickness=1)
+    # slider_9_label = TextBox(display, s_left, t_top + s_dist * 9, 0, t_height, fontSize=fontsize, borderThickness=1).setText("slider 9")
 
     #%% slider settings end
+
+    #%% mouse settings start TBD (Falco Punch!)
+    #%% mouse settings end
 
     clock = pg.time.Clock()
 
@@ -83,6 +102,8 @@ def main(sim, fps, window_size):
             elif type(obstacle) is Circle:
                 pg.draw.circle(display, BLUE, obstacle.pos, obstacle.rad)
 
+        for actor in sim.actors:
+            break  # predator TBD
         for actor in sim.actors:
             direction = Vector(0, 0)
             for d in actor.dir_history:
