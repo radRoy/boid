@@ -50,6 +50,7 @@ def main(sim, fps, window_size):
             left = actor.pos - direction * 10 + direction.orthonormal() * 2
             right = actor.pos - direction * 10 - direction.orthonormal() * 2
             pg.draw.polygon(display, actor.color, points=[actor.pos, left, right])
+            pg.draw.line(display, GREEN, actor.pos, actor.pos + actor.ahead)
 
         for obstacle in sim.obstacles:
             if type(obstacle) is Wall:
