@@ -38,20 +38,18 @@ def main(sim, fps, window_size):
     t_top = s_top + t_dist
     t_width, t_height = 30, 20
 
+    # Sliders and TextBoxes by Simulation parameter
     sep_slider = Slider(display, s_left, s_top, s_width, s_height, min=0.0, max=10.0, step=.1)
     sep_out = TextBox(display, t_left, t_top, 0, t_height, fontSize=fontsize, borderThickness=1)
     sep_label = TextBox(display, s_left, s_top + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText("separation")
-    sep_out.disable()  # act as label instead of textbox
 
     coh_slider = Slider(display, s_left, s_top + s_dist, s_width, s_height, min=0.0, max=10.0, step=.1)
     coh_out = TextBox(display, t_left, t_top + s_dist, 0, t_height, fontSize=fontsize, borderThickness=1)
     coh_label = TextBox(display, s_left, s_top + s_dist + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText("coherence")
-    coh_out.disable()
 
     align_slider = Slider(display, s_left, s_top + s_dist * 2, s_width, s_height, min=0.0, max=10.0, step=.1)
     align_out = TextBox(display, t_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1)
     align_label = TextBox(display, s_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1).setText("alignment")
-    align_out.disable()
 
     #%% slider settings end
 
