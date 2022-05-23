@@ -23,22 +23,33 @@ def main(sim, fps, window_size):
 
     #%% slider settings start
 
-    slider_left, slider_top = 15, 15  # distance in pixel between sliders and left, top pg.display border
-    slider_width, slider_height = 100, 10  # width (x-dir.), height (y-dir.) in pixel
-    separation_slider = Slider(display, slider_left, slider_top, slider_width, slider_height, min=0.0, max=10.0, step=.01)
-    textbox_width, textbox_height = 20, 20
-    textbox_dist = 20
-    separation_output = TextBox(display, slider_left, slider_top + textbox_dist, textbox_width, textbox_height, fontSize=16, borderThickness=1)
-    separation_output.disable()  # act as label instead of textbox
+    # Slider settings
+    s_left = 15  # distance to left window border (x-dir.) in px
+    s_top = 15  # distance to top window border (x-dir.) in px
+    s_width = 100  # width (x-dir.) in px
+    s_height = 10  # height (y-dir.) in px
+    s_dist = 50  # distance between sliders (y-dir.) in px
 
-    slider_dist = 50
-    cohesion_slider = Slider(display, slider_left, slider_top + slider_dist, slider_width, slider_height, min=0.0, max=10.0, step=.01)
-    cohesion_output = TextBox(display, slider_left, slider_top + slider_dist + textbox_dist, textbox_width, textbox_height, fontSize=16, borderThickness=1)
-    cohesion_output.disable()
+    # TextBox settings
+    t_dist = 15  # dist. to corr. slider (above in animation)
+    t_left = s_left + s_width + 5  # dist. to left border
+    t_top = s_top + t_dist
+    t_width, t_height = 30, 20
 
-    alignment_slider = Slider(display, slider_left, slider_top + slider_dist*2, slider_width, slider_height, min=0.0, max=10.0, step=.01)
-    alignment_output = TextBox(display, slider_left, slider_top + slider_dist*2 + textbox_dist, textbox_width, textbox_height, fontSize=16, borderThickness=1)
-    alignment_output.disable()
+    sep_slider = Slider(display, s_left, s_top, s_width, s_height, min=0.0, max=10.0, step=.1)
+    sep_out = TextBox(display, t_left, t_top, 0, t_height, fontSize=16, borderThickness=1)
+    sep_label = TextBox(display, s_left, s_top + t_dist, 0, t_height, borderThickness=1).setText("separation")
+    sep_out.disable()  # act as label instead of textbox
+
+    coh_slider = Slider(display, s_left, s_top + s_dist, s_width, s_height, min=0.0, max=10.0, step=.1)
+    coh_out = TextBox(display, t_left, t_top + s_dist, 0, t_height, fontSize=16, borderThickness=1)
+    coh_label = TextBox(display, s_left, s_top + s_dist + t_dist, 0, t_height, borderThickness=1).setText("coherence")
+    coh_out.disable()
+
+    align_slider = Slider(display, s_left, s_top + s_dist * 2, s_width, s_height, min=0.0, max=10.0, step=.1)
+    align_out = TextBox(display, t_left, t_top + s_dist * 2, 0, t_height, fontSize=16, borderThickness=1)
+    align_label = TextBox(display, s_left, t_top + s_dist * 2, 0, t_height, borderThickness=1).setText("alignment")
+    align_out.disable()
 
     #%% slider settings end
 
@@ -50,20 +61,21 @@ def main(sim, fps, window_size):
             if event.type == pg.QUIT:
                 sys.exit()
 
-        dt = clock.tick(fps)
-        sim.step(dt)
-        display.fill(WHITE)
-
         # feeding slider values into simulation parameters
-        actors.separation_strength = separation_slider.getValue()  # 7.0 (yep, dem is birds, alright)
-        actors.cohesion_strength = cohesion_slider.getValue()  # 3.0
-        actors.alignment_strength = alignment_slider.getValue()  # 3.5
+        actors.separation_strength = sep_slider.getValue()  # 7.0 (yep, dem is birds, alright)
+        actors.cohesion_strength = coh_slider.getValue()  # 3.0
+        actors.alignment_strength = align_slider.getValue()  # 3.5
 
         # each following drawing command draws on top of previous ones (so, leave widgets.update on top)
-        separation_output.setText(actors.separation_strength)
-        cohesion_output.setText(actors.cohesion_strength)
-        alignment_output.setText(actors.alignment_strength)
+        sep_out.setText(actors.separation_strength)
+        coh_out.setText(actors.cohesion_strength)
+        align_out.setText(actors.alignment_strength)
+
+        display.fill(WHITE)
         pg_widgets.update(events)
+
+        dt = clock.tick(fps)
+        sim.step(dt)
 
         for obstacle in sim.obstacles:
             if type(obstacle) is Wall:
