@@ -17,18 +17,19 @@ Useful links:
 algorithms:
 - flocking behaviour works well
 - efficient computation
-- obstacle avoidance (incl. coundary conditions)
+- obstacle avoidance for boundary condition
 
 live animation
 - live pygame animation
 - rotating boids
 - proxy of current velocity implemented? (stretching boid icons?)
-- pygame plotting solved?
 
 ## To Be Done
 animation:
 - live parameter sliders
 - mouse interface
+- draw circle obstacles & test Circle obstacle avoidance
+- have a general pygame plotting method implemented (e.g., with some mpl.pyplot backend like agg)
 - ()boids have acceleration vectors, visualising boids' intention
 
 ## Discuss / Possibilities
