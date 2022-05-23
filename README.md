@@ -45,6 +45,11 @@ Can we reproduce and verify previous work on these questions, suggesting that co
 
 #### potential Bonus section at the end
 Could we make a couch 2 or even multiplayer game out of it? (refer to swarm control paper)
+- gameplay concepts?
+  - boids herding, swarm control
+  - swarm manipulation (be the covert alpha boid)
+  - eat all the boids
+  - ...
 - real world applications?
 - spin-offs?
 - code adaptability? (plug our code into your simulation and get better grades!)
