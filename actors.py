@@ -2,9 +2,9 @@ from vectors2d import Vector
 from obstacles import Circle, Wall
 import math
 
-avoidance_strength = 1.0
-separation_strength = 1.0
-separation_radius = 1.0
+avoidance_strength = 100.0
+separation_strength = 4.0
+separation_radius = 20.0
 alignment_strength = 1.0
 cohesion_strength = 1.0
 
@@ -87,7 +87,7 @@ class Actor:
             avoidance = (threat.orthonormal_vector_to(self.pos)) * avoidance_strength / threat_dist
             return avoidance
         elif type(threat) is Circle:
-            avoidance = (self.pos - threat.pos).normalize() * avoidance_strength / threat_dist
+            avoidance = (self.pos - threat.pos).normalize() * avoidance_strength*20 / threat_dist
             return avoidance
         else:
             return Vector(0, 0)
@@ -167,7 +167,7 @@ class Boid(Actor):
         alignment = avg_direction.normalize() * alignment_strength
         return alignment
 
-    def calc_cohesion(self, strength):
+    def calc_cohesion(self):
         """Calculate the cohesion force of the boids which makes them stay together."""
         if not self.neighbors:
             return Vector(0, 0)
