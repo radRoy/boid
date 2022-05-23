@@ -1,5 +1,9 @@
 import sys
 import pygame as pg
+import pygame_widgets as pg_widgets
+from pygame_widgets.slider import Slider
+from pygame_widgets.textbox import TextBox
+import actors
 from simulation import Simulation
 from obstacles import Obstacle, Circle, Wall
 from vectors2d import Vector
@@ -33,13 +37,19 @@ def main(sim, fps, window_size):
     clock = pg.time.Clock()
 
     while True:
-        for event in pg.event.get():
+        events = pg.event.get()
+        for event in events:
             if event.type == pg.QUIT:
                 sys.exit()
 
         dt = clock.tick(fps)
         sim.step(dt)
         display.fill(WHITE)
+
+        cohesion_output.setText(cohesion_slider.getValue())
+        pg_widgets.update(events)
+
+        # actors.cohesion_strength = cohesion_slider.getValue()
 
         for actor in sim.actors:
             direction = Vector(0, 0)
