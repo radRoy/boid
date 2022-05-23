@@ -27,8 +27,8 @@ def main(sim, fps, window_size):
     cohesion_slider = Slider(display, 10, 90, 100, 10, min=0, max=10.0, step=.01)
 
     # TextBox(pg.display, dist_left, dist_top, length, width, ...)
-    cohesion_output = TextBox(display, 45, 30, 25, 25, fontSize=16, borderThickness=1)
-    cohesion_output = TextBox(display, 45, 70, 25, 25, fontSize=16, borderThickness=1)
+    separation_output = TextBox(display, 45, 30, 25, 25, fontSize=16, borderThickness=1)
+    alignment_output = TextBox(display, 45, 70, 25, 25, fontSize=16, borderThickness=1)
     cohesion_output = TextBox(display, 45, 110, 25, 25, fontSize=16, borderThickness=1)
     cohesion_output.disable()  # Act as label instead of textbox
 
