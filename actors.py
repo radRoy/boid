@@ -7,6 +7,8 @@ separation_strength = 4.0
 separation_radius = 20.0
 alignment_strength = 1.0
 cohesion_strength = 1.0
+evasion_strength = 10.0
+pursuit_strength = 4.0
 
 
 class Actor:
@@ -94,16 +96,17 @@ class Actor:
 class Boid(Actor):
     """Boid class."""
 
-    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color, flock, predators):
+    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color, flock):
         Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
         self.flock = flock  # all other boids in the simulation
-        self.predators = predators  # all the predators in the simulation
+        self.predators = simulation.predators  # all the predators in the simulation
         self.neighbors = []  # all boids that are close
         self.threats = []  # all predators that are close (and in fov)
 
     def update(self, dt):
         self.get_neighbors()
         self.forces += self.calc_flocking()
+        self.forces += self.calc_evasion()
         Actor.update(self, dt)
 
         self.change_color()
@@ -126,7 +129,7 @@ class Boid(Actor):
         self.threats = []
         for predator in self.predators:
             if self.pos.distance_to(predator.pos) <= self.view_dist ** 2:
-                self.threats.apend(predator)
+                self.threats.append(predator)
 
     def calc_flocking(self):
         """Calculates all the flocking forces."""
@@ -191,8 +194,7 @@ class Boid(Actor):
 
     def calc_evasion(self):
         """Calculate the evasion force which makes them evade any predators"""
-        # TODO find the closest predator
-        # DONE
+        # TODONE find the closest predator
         closest_threat = None
         self.get_threats()
         for threat in self.threats:
@@ -202,14 +204,16 @@ class Boid(Actor):
             elif self.pos.distance_to(threat) < self.pos.distance_to(closest_threat):
                 closest_threat = threat
 
-        # TODO calculate the evasion force (see https://gamedevelopment.tutsplus.com/tutorials/understanding-steering-behaviors-pursuit-and-evade--gamedev-2946)
+        # TODONE calculate the evasion force
+        closest_threat: Predator
 
-        """
-        vector self - threat
-        future pos"""
-        
+        # peek calcforce to adapt force calc formailities
+        # enterd orthonormal vectore stuff
+        distance = self.pos.distance_to(closest_threat.pos)
+        direction = closest_threat.v.side(closest_threat.v, self.pos) * closest_threat.v.orthonormal()
+        evasion = direction * evasion_strength / distance
 
-        evasion = Vector(0, 0)
+        #evasion = Vector(0, 0)
         return evasion
 
 
