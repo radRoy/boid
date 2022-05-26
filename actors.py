@@ -94,10 +94,12 @@ class Actor:
 class Boid(Actor):
     """Boid class."""
 
-    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color, flock):
+    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color, flock, predators):
         Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
         self.flock = flock  # all other boids in the simulation
+        self.predators = predators  # all the predators in the simulation
         self.neighbors = []  # all boids that are close
+        self.threats = []  # all predators that are close (and in fov)
 
     def update(self, dt):
         self.get_neighbors()
@@ -118,6 +120,13 @@ class Boid(Actor):
                 continue
             elif self.pos.distance_to(member.pos) <= self.view_dist ** 2 and self.in_fov(member.pos):
                 self.neighbors.append(member)
+
+    def get_threats(self):
+        """Gets all the predators and that are visible to the boid and classifies them as threats. Creates self.threats list."""
+        self.threats = []
+        for predator in self.predators:
+            if self.pos.distance_to(predator.pos) <= self.view_dist ** 2:
+                self.threats.apend(predator)
 
     def calc_flocking(self):
         """Calculates all the flocking forces."""
@@ -183,7 +192,23 @@ class Boid(Actor):
     def calc_evasion(self):
         """Calculate the evasion force which makes them evade any predators"""
         # TODO find the closest predator
+        # DONE
+        closest_threat = None
+        self.get_threats()
+        for threat in self.threats:
+            if closest_threat == None:  # dw: avoid using `is None`, weird happens
+                closest_threat = threat
+                continue
+            elif self.pos.distance_to(threat) < self.pos.distance_to(closest_threat):
+                closest_threat = threat
+
         # TODO calculate the evasion force (see https://gamedevelopment.tutsplus.com/tutorials/understanding-steering-behaviors-pursuit-and-evade--gamedev-2946)
+
+        """
+        vector self - threat
+        future pos"""
+        
+
         evasion = Vector(0, 0)
         return evasion
 
