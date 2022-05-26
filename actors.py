@@ -7,7 +7,7 @@ separation_strength = 4.0
 separation_radius = 20.0
 alignment_strength = 1.0
 cohesion_strength = 1.0
-evasion_strength = 10.0
+evasion_strength = 100.0
 pursuit_strength = 4.0
 
 
@@ -123,14 +123,14 @@ class Boid(Actor):
         for member in self.sim.flock:
             if member is self:
                 continue
-            elif self.pos.distance_to(member.pos) <= self.view_dist ** 2 and self.in_fov(member.pos):
+            elif self.pos.distance_to(member.pos) <= self.view_dist and self.in_fov(member.pos):
                 self.neighbors.append(member)
 
     def get_threats(self):
         """Gets all the predators and that are visible to the boid and classifies them as threats. Creates self.threats list."""
         self.threats = []
         for predator in self.sim.predators:
-            if self.pos.distance_to(predator.pos) <= self.view_dist ** 2:
+            if self.pos.distance_to(predator.pos) <= self.view_dist:
                 self.threats.append(predator)
 
     def calc_flocking(self):
@@ -200,20 +200,22 @@ class Boid(Actor):
         closest_threat = None
         self.get_threats()
         for threat in self.threats:
-            if closest_threat == None:  # dw: avoid using `is None`, weird happens
+            if closest_threat is None:  # dw: avoid using `is None`, weird happens
                 closest_threat = threat
                 continue
-            elif self.pos.distance_to(threat) < self.pos.distance_to(closest_threat):
+            elif self.pos.distance_to(threat.pos) < self.pos.distance_to(closest_threat.pos):
                 closest_threat = threat
 
         # TODONE calculate the evasion force
-        closest_threat: Predator
 
         # peek calcforce to adapt force calc formailities
         # enterd orthonormal vectore stuff
-        distance = self.pos.distance_to(closest_threat.pos)
-        direction = closest_threat.v.side(closest_threat.v, self.pos) * closest_threat.v.orthonormal()
-        evasion = direction * evasion_strength / distance
+        if closest_threat is None:
+            evasion = Vector(0, 0)
+        else:
+            distance = self.pos.distance_to(closest_threat.pos)
+            direction = closest_threat.v.side(closest_threat.pos, self.pos) * closest_threat.v.orthonormal()
+            evasion = direction * evasion_strength / distance
 
         #evasion = Vector(0, 0)
         return evasion

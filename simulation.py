@@ -12,7 +12,7 @@ class Simulation:
         self.flock = []
         self.predators = []
         self.obstacles = []
-        self.boid_settings = {"max_speed": 0.2, "view_distance": 50, "view_angle": np.pi*1.5, "mass": 5000,
+        self.boid_settings = {"max_speed": 0.1, "view_distance": 50, "view_angle": np.pi*1.5, "mass": 5000,
                               "color": (255, 255, 0)}
 
     def setup(self, nboids):
