@@ -32,7 +32,7 @@ class Simulation:
         self.add_n_boids(nboids, positions, velocities)
 
         # add a predator
-        self.add_predator((self.window_size[0]/2, self.window_size[1]/2), (1, 0))
+        self.add_predator((self.window_size[0]/2, self.window_size[1]/2), (1, 0), view_angle=np.pi/2)
 
     def add_obstacles(self, *args):
         for obstacle in args:

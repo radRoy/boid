@@ -67,7 +67,7 @@ class Actor:
                         threat = obstacle
                         threat_dist = dist
             elif type(obstacle) is Circle:
-                dist = self.pos.distance_to(obstacle.pos)
+                dist = max(0.0000001, self.pos.distance_to(obstacle.pos) - obstacle.rad)
                 if threat_dist is None or dist < threat_dist:
                     close_dist = (self.pos + small_ahead).distance_to(obstacle.pos)
                     far_dist = (self.pos + self.ahead).distance_to(obstacle.pos)
@@ -79,7 +79,7 @@ class Actor:
             avoidance = (threat.orthonormal_vector_to(self.pos)) * avoidance_strength / threat_dist
             return avoidance
         elif type(threat) is Circle:
-            avoidance = (self.pos - threat.pos).normalize() * avoidance_strength * 20 / threat_dist
+            avoidance = (self.pos - threat.pos).normalize() * avoidance_strength / threat_dist
             return avoidance
         else:
             return Vector(0, 0)

@@ -104,3 +104,11 @@ class Vector(tuple):
     def cross(self, other):
         return self.x * other.y - self.y * other.x
 
+    def determinant(self, start, point):
+        stop = start + self
+        return (stop.x - start.x) * (point.y - start.y) - (stop.y - start.y) * (point.x - start.x)
+
+    def side(self, start, point):
+        """Returns -1 if the point is on the left and +1 if it is on the right."""
+        return math.copysign(1, - self.determinant(start, point))
+

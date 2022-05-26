@@ -35,24 +35,24 @@ def setup_sliders(display):
     # Sliders and TextBoxes by Simulation parameter
     sep_slider = Slider(display, s_left, s_top, s_width, s_height, min=0.0, max=10.0, step=.1)
     sep_out = TextBox(display, t_left, t_top, 0, t_height, fontSize=fontsize, borderThickness=1)
-    sep_label = TextBox(display, s_left, s_top + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText(
-        "separation")
-    coh_slider = Slider(display, s_left, s_top + s_dist, s_width, s_height, min=0.0, max=10.0, step=.1)
-    coh_out = TextBox(display, t_left, t_top + s_dist, 0, t_height, fontSize=fontsize, borderThickness=1)
-    coh_label = TextBox(display, s_left, s_top + s_dist + t_dist, 0, t_height, fontSize=fontsize,
-                        borderThickness=1).setText("coherence")
-    align_slider = Slider(display, s_left, s_top + s_dist * 2, s_width, s_height, min=0.0, max=10.0, step=.1)
-    align_out = TextBox(display, t_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1)
-    align_label = TextBox(display, s_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize,
-                          borderThickness=1).setText("alignment")
-    maxvel_slider = Slider(display, s_left, s_top + s_dist * 4, s_width, s_height, min=0.0, max=10.0, step=.1)
-    maxvel_out = TextBox(display, t_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize, borderThickness=1)
-    maxvel_label = TextBox(display, s_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize,
-                           borderThickness=1).setText("slider 4")
-    slider_5 = Slider(display, s_left, s_top + s_dist * 5, s_width, s_height, min=0.0, max=10.0, step=.1)
-    slider_5_out = TextBox(display, t_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize, borderThickness=1)
-    slider_5_label = TextBox(display, s_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize,
-                             borderThickness=1).setText("slider 5")
+    sep_label = TextBox(display, s_left, s_top + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Separation")
+
+    align_slider = Slider(display, s_left, s_top + s_dist, s_width, s_height, min=0.0, max=10.0, step=.1)
+    align_out = TextBox(display, t_left, t_top + s_dist, 0, t_height, fontSize=fontsize, borderThickness=1)
+    align_label = TextBox(display, s_left, s_top + s_dist + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Alignment")
+
+    coh_slider = Slider(display, s_left, s_top + s_dist * 2, s_width, s_height, min=0.0, max=10.0, step=.1)
+    coh_out = TextBox(display, t_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1)
+    coh_label = TextBox(display, s_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Cohesion")
+
+    sep_rad_slider = Slider(display, s_left, s_top + s_dist * 4, s_width, s_height, min=0.0, max=80.0, step=.1)
+    sep_rad_out = TextBox(display, t_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize, borderThickness=1)
+    sep_rad_label = TextBox(display, s_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Separation rad")
+
+    avoid_slider = Slider(display, s_left, s_top + s_dist * 5, s_width, s_height, min=0.0, max=400.0, step=1)
+    avoid_out = TextBox(display, t_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize, borderThickness=1)
+    avoid_label = TextBox(display, s_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Avoidance")
+
     # slider_6 = Slider(display, s_left, s_top + s_dist * 6, s_width, s_height, min=0.0, max=10.0, step=.1)
     # slider_6_out = TextBox(display, t_left, t_top + s_dist * 6, 0, t_height, fontSize=fontsize, borderThickness=1)
     # slider_6_label = TextBox(display, s_left, t_top + s_dist * 6, 0, t_height, fontSize=fontsize, borderThickness=1).setText("slider 6")
@@ -67,7 +67,8 @@ def setup_sliders(display):
     # slider_9_label = TextBox(display, s_left, t_top + s_dist * 9, 0, t_height, fontSize=fontsize, borderThickness=1).setText("slider 9")
 
     slider_settings = {"sep_slider": sep_slider, "coh_slider": coh_slider, "align_slider": align_slider,
-                       "sep_out": sep_out, "coh_out": coh_out, "align_out": align_out}
+                       "sep_rad_slider": sep_rad_slider, "avoid_slider": avoid_slider, "sep_out": sep_out,
+                       "coh_out": coh_out, "align_out": align_out, "sep_rad_out": sep_rad_out, "avoid_out": avoid_out}
 
     return slider_settings
 
@@ -77,11 +78,15 @@ def slider_update(slider_settings):
     actors.separation_strength = slider_settings["sep_slider"].getValue()  # 7.0 (yep, dem is birds, alright)
     actors.cohesion_strength = slider_settings["coh_slider"].getValue()  # 3.0
     actors.alignment_strength = slider_settings["align_slider"].getValue()  # 3.5
+    actors.separation_radius = slider_settings["sep_rad_slider"].getValue()
+    actors.avoidance_strength = slider_settings["avoid_slider"].getValue()
 
     # each following drawing command draws on top of previous ones (so, leave widgets.update on top)
     slider_settings["sep_out"].setText(actors.separation_strength)
     slider_settings["coh_out"].setText(actors.cohesion_strength)
     slider_settings["align_out"].setText(actors.alignment_strength)
+    slider_settings["sep_rad_out"].setText(actors.separation_radius)
+    slider_settings["avoid_out"].setText(actors.avoidance_strength)
 
 
 def draw_actors(sim, display):
@@ -109,7 +114,7 @@ def draw_obstacles(sim, display):
         if type(obstacle) is Wall:
             pg.draw.line(display, BLUE, obstacle.start, obstacle.stop, 10)
         elif type(obstacle) is Circle:
-            pg.draw.circle(display, BLUE, obstacle.pos, obstacle.rad)
+            pg.draw.circle(display, (0, 0, 255), obstacle.pos, obstacle.rad)
 
 
 def main(sim, fps, window_size):
@@ -119,7 +124,7 @@ def main(sim, fps, window_size):
     display = pg.display.set_mode(window_size)
     clock = pg.time.Clock()
 
-    # slider_settings = setup_sliders(display)
+    slider_settings = setup_sliders(display)
 
     mouse_circle = None
 
@@ -130,7 +135,7 @@ def main(sim, fps, window_size):
         for event in events:
             if event.type == pg.QUIT:
                 sys.exit()
-            elif event.type == pg.MOUSEBUTTONUP:
+            elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
                 if mouse_circle is not None:
                     sim.delete_obstacles(mouse_circle)
                 mouse_pos = pg.mouse.get_pos()
@@ -138,20 +143,22 @@ def main(sim, fps, window_size):
                 sim.add_obstacles(mouse_circle)
 
         display.fill(WHITE)
-        pg_widgets.update(events)
         dt = clock.tick(fps)
 
-        # slider_update(slider_settings)
+        slider_update(slider_settings)
 
         sim.step(dt)
         draw_actors(sim, display)
         draw_obstacles(sim, display)
 
+        pg_widgets.update(events)
+
         pg.display.update()
 
 
 if __name__ == "__main__":
-    sim_test = Simulation((720, 720))
+    res = (1080, 720)
+    sim_test = Simulation(res)
     sim_test.setup(nboids=50)
 
-    main(sim=sim_test, fps=30, window_size=(720, 720))
+    main(sim=sim_test, fps=30, window_size=res)

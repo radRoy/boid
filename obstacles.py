@@ -39,7 +39,6 @@ class Wall(Obstacle):
 
     def side(self, point):
         """Returns -1 if the point is on the left and +1 if it is on the right."""
-
         return math.copysign(1, - self.determinant(point))
 
     def orthonormal_vector_to(self, point):
