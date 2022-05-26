@@ -76,4 +76,4 @@ class Simulation:
 
     def step(self, dt):
         for actor in self.actors:
-            actor.update(dt)
+            actor.updae(dt)

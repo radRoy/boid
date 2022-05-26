@@ -8,7 +8,7 @@ separation_radius = 20.0
 alignment_strength = 1.0
 cohesion_strength = 1.0
 evasion_strength = 100.0
-pursuit_strength = 4.0
+pursuit_strength = evasion_strength
 
 
 class Actor:
@@ -217,7 +217,6 @@ class Boid(Actor):
             direction = closest_threat.v.side(closest_threat.pos, self.pos) * closest_threat.v.orthonormal()
             evasion = direction * evasion_strength / distance
 
-        #evasion = Vector(0, 0)
         return evasion
 
 
@@ -226,21 +225,46 @@ class Predator(Actor):
 
     def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color):
         Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
+        self.targets = []
 
     def update(self, dt):
-        self.forces += self.calc_pursuit()
+        self.forces += self.calc_pursuit(dt)
         Actor.update(self, dt)
 
-    def calc_pursuit(self):
+    def calc_pursuit(self, dt):
         """Calculate the pursuit force which makes them pursuit the closest boid"""
         target = self.find_target()
-        # TODO calculate the pursuit force (see https://gamedevelopment.tutsplus.com/tutorials/understanding-steering-behaviors-pursuit-and-evade--gamedev-2946)
-        pursuit = Vector(0, 0)
+        if target is None:
+            pursuit = Vector(0, 0)
+        else:
+            # TODO calculate the pursuit acceleration
+            direction = self.pos.direction_to(target.pos + target.v * 50 * dt)
+            distance = self.pos.distance_to(target.pos)
+            pursuit = pursuit_strength * direction / distance
+
         return pursuit
 
     def find_target(self):
         # TODO check if any boid is within view_distance
+        around = False
+        for boid in self.sim.flock:
+            if self.pos.distance_to(boid.pos) < self.view_dist:
+                around = True
+                break
+
         # TODO check if any of those boids are in field of view (using self.in_fov())
+        if around:
+            for boid in self.sim.flock:
+                if self.pos.distance_to(boid.pos) < self.view_dist and self.in_fov(boid.pos):
+                    self.targets.append(boid)
+
         # TODO select the closest of those Boids as the new target
-        target = None
+        if len(self.targets) > 0:
+            closest_target = self.targets[0]
+            for target in self.targets:
+                if closest_target is not target and self.pos.distance_to(target.pos) < self.pos.distance_to(closest_target.pos):
+                    closest_target = target
+        else:
+            target = None
+
         return target
