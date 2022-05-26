@@ -153,7 +153,7 @@ class Boid(Actor):
             distance = self.pos.distance_to(neighbor.pos)  # distance to the neighbor
             if distance <= separation_radius:
                 close_neighbors += 1
-                # we divide by distance such the separation force is stronger for closer neighbors.
+                # divide by distance such that the separation force is stronger for closer neighbors.
                 avg_evasion += (self.pos - neighbor.pos) / distance  # vector pointing away from the neighbor
 
         if close_neighbors == 0:
@@ -196,20 +196,15 @@ class Boid(Actor):
 
     def calc_evasion(self):
         """Calculate the evasion force which makes them evade any predators"""
-        # TODONE find the closest predator
         closest_threat = None
         self.get_threats()
         for threat in self.threats:
-            if closest_threat is None:  # dw: avoid using `is None`, weird happens
+            if closest_threat is None:
                 closest_threat = threat
                 continue
             elif self.pos.distance_to(threat.pos) < self.pos.distance_to(closest_threat.pos):
                 closest_threat = threat
 
-        # TODONE calculate the evasion force
-
-        # peek calcforce to adapt force calc formailities
-        # enterd orthonormal vectore stuff
         if closest_threat is None:
             evasion = Vector(0, 0)
         else:
