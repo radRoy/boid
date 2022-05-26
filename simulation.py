@@ -7,24 +7,25 @@ from vectors2d import Vector
 class Simulation:
     def __init__(self, window_size=(1, 1)):
         self.window_size = Vector(window_size[0], window_size[1])
+        self.center = Vector(window_size[0]/2, window_size[1]/2)
         self.actors = []
         self.flock = []
         self.predators = []
         self.obstacles = []
-        self.boid_settings = {"max_speed": 0.1, "view_distance": 50, "view_angle": np.pi*1.5, "mass": 5000,
+        self.boid_settings = {"max_speed": 0.2, "view_distance": 50, "view_angle": np.pi*1.5, "mass": 5000,
                               "color": (255, 255, 0)}
 
     def setup(self, nboids):
         # Create four walls around the edges and add them to the obstacles
-        top_wall = Wall((0, 0), (self.window_size[0], 0))
-        right_wall = Wall((self.window_size[0], 0), (self.window_size[0], self.window_size[1]))
-        bottom_wall = Wall((self.window_size[0], self.window_size[1]), (0, self.window_size[1]))
-        left_wall = Wall((0, self.window_size[1]), (0, 0))
+        top_wall = Wall((0, 0), (self.window_size.x, 0))
+        right_wall = Wall((self.window_size.x, 0), (self.window_size.x, self.window_size.y))
+        bottom_wall = Wall((self.window_size.x, self.window_size.x), (0, self.window_size.y))
+        left_wall = Wall((0, self.window_size.y), (0, 0))
         self.add_obstacles(top_wall, right_wall, bottom_wall, left_wall)
 
         # Create random positions and velocities
-        x_vals = np.random.uniform(0, self.window_size[0], nboids)
-        y_vals = np.random.uniform(0, self.window_size[1], nboids)
+        x_vals = np.random.uniform(0, self.window_size.x, nboids)
+        y_vals = np.random.uniform(0, self.window_size.y, nboids)
         positions = np.column_stack((x_vals, y_vals))
         velocities = np.random.uniform(-1, 1, (nboids, 2))
 
@@ -32,7 +33,7 @@ class Simulation:
         self.add_n_boids(nboids, positions, velocities)
 
         # add a predator
-        self.add_predator((self.window_size[0]/2, self.window_size[1]/2), (1, 0), view_angle=np.pi/2)
+        self.add_predator(self.center, (1, 0), view_angle=np.pi/2)
 
     def add_obstacles(self, *args):
         for obstacle in args:
@@ -43,6 +44,9 @@ class Simulation:
             self.obstacles.remove(obstacle)
             del obstacle
 
+    def clear_obstacles(self):
+        del self.obstacles[4:]
+
     def add_n_boids(self, n, positions, velocities):
         for i in range(n):
             new = Boid(simulation=self,
@@ -52,8 +56,7 @@ class Simulation:
                        view_distance=self.boid_settings["view_distance"],
                        view_angle=self.boid_settings["view_angle"],
                        mass=self.boid_settings["mass"],
-                       color=self.boid_settings["color"],
-                       flock=self.flock)
+                       color=self.boid_settings["color"])
 
             self.flock.append(new)
             self.actors.append(new)

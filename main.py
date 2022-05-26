@@ -34,24 +34,34 @@ def setup_sliders(display):
 
     # Sliders and TextBoxes by Simulation parameter
     sep_slider = Slider(display, s_left, s_top, s_width, s_height, min=0.0, max=10.0, step=.1)
+    sep_slider.setValue(4.0)
     sep_out = TextBox(display, t_left, t_top, 0, t_height, fontSize=fontsize, borderThickness=1)
-    sep_label = TextBox(display, s_left, s_top + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Separation")
+    sep_label = TextBox(display, s_left, s_top + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText(
+        "Separation")
 
     align_slider = Slider(display, s_left, s_top + s_dist, s_width, s_height, min=0.0, max=10.0, step=.1)
+    align_slider.setValue(1.0)
     align_out = TextBox(display, t_left, t_top + s_dist, 0, t_height, fontSize=fontsize, borderThickness=1)
-    align_label = TextBox(display, s_left, s_top + s_dist + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Alignment")
+    align_label = TextBox(display, s_left, s_top + s_dist + t_dist, 0, t_height, fontSize=fontsize,
+                          borderThickness=1).setText("Alignment")
 
     coh_slider = Slider(display, s_left, s_top + s_dist * 2, s_width, s_height, min=0.0, max=10.0, step=.1)
+    coh_slider.setValue(1.0)
     coh_out = TextBox(display, t_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1)
-    coh_label = TextBox(display, s_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Cohesion")
+    coh_label = TextBox(display, s_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1).setText(
+        "Cohesion")
 
     sep_rad_slider = Slider(display, s_left, s_top + s_dist * 4, s_width, s_height, min=0.0, max=80.0, step=.1)
+    sep_rad_slider.setValue(20.0)
     sep_rad_out = TextBox(display, t_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize, borderThickness=1)
-    sep_rad_label = TextBox(display, s_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Separation rad")
+    sep_rad_label = TextBox(display, s_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize,
+                            borderThickness=1).setText("Separation rad")
 
     avoid_slider = Slider(display, s_left, s_top + s_dist * 5, s_width, s_height, min=0.0, max=400.0, step=1)
+    avoid_slider.setValue(100.0)
     avoid_out = TextBox(display, t_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize, borderThickness=1)
-    avoid_label = TextBox(display, s_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Avoidance")
+    avoid_label = TextBox(display, s_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize,
+                          borderThickness=1).setText("Avoidance")
 
     # slider_6 = Slider(display, s_left, s_top + s_dist * 6, s_width, s_height, min=0.0, max=10.0, step=.1)
     # slider_6_out = TextBox(display, t_left, t_top + s_dist * 6, 0, t_height, fontSize=fontsize, borderThickness=1)
@@ -126,7 +136,12 @@ def main(sim, fps, window_size):
 
     slider_settings = setup_sliders(display)
 
-    mouse_circle = None
+    font = pg.font.Font("freesansbold.ttf", 24)
+    text = font.render("clear", True, (0, 0, 0), (200, 200, 200))
+    clear_rect = text.get_rect()
+    clear_rect.center = (sim.window_size.x - 48, 24)
+
+    wall_start = None
 
     # Main game loop
     while True:
@@ -135,12 +150,20 @@ def main(sim, fps, window_size):
         for event in events:
             if event.type == pg.QUIT:
                 sys.exit()
+            elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                if clear_rect.collidepoint(pg.mouse.get_pos()):
+                    sim.clear_obstacles()
             elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
-                if mouse_circle is not None:
-                    sim.delete_obstacles(mouse_circle)
                 mouse_pos = pg.mouse.get_pos()
-                mouse_circle = Circle(mouse_pos, 20)
-                sim.add_obstacles(mouse_circle)
+                sim.add_obstacles(Circle(mouse_pos, 20))
+            elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                if wall_start is None:
+                    wall_start = pg.mouse.get_pos()
+                else:
+                    wall_stop = pg.mouse.get_pos()
+                    wall = Wall(wall_start, wall_stop)
+                    sim.add_obstacles(wall)
+                    wall_start = None
 
         display.fill(WHITE)
         dt = clock.tick(fps)
@@ -150,6 +173,7 @@ def main(sim, fps, window_size):
         sim.step(dt)
         draw_actors(sim, display)
         draw_obstacles(sim, display)
+        display.blit(text, clear_rect)
 
         pg_widgets.update(events)
 

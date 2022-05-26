@@ -53,6 +53,9 @@ class Actor:
 
         self.forces = Vector(0, 0)  # reset all the forces after applying them
 
+        if not 0 <= self.pos.x <= self.sim.window_size[0] or not 0 <= self.pos.y <= self.sim.window_size[1]:
+            self.v = (self.sim.center - self.pos).normalize()*self.max_speed
+
         self.pos += self.v * dt  # update the position
         self.ahead = 50 * self.v * dt  # update the ahead vector
 
@@ -96,10 +99,9 @@ class Actor:
 class Boid(Actor):
     """Boid class."""
 
-    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color, flock):
+    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color):
         Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
-        self.flock = flock  # all other boids in the simulation
-        self.predators = simulation.predators  # all the predators in the simulation
+        # self.predators = predators  # all the predators in the simulation
         self.neighbors = []  # all boids that are close
         self.threats = []  # all predators that are close (and in fov)
 
@@ -118,7 +120,7 @@ class Boid(Actor):
     def get_neighbors(self):
         """Gets all the neighbors that are visible to the boid."""
         self.neighbors = []
-        for member in self.flock:
+        for member in self.sim.flock:
             if member is self:
                 continue
             elif self.pos.distance_to(member.pos) <= self.view_dist ** 2 and self.in_fov(member.pos):
@@ -127,7 +129,7 @@ class Boid(Actor):
     def get_threats(self):
         """Gets all the predators and that are visible to the boid and classifies them as threats. Creates self.threats list."""
         self.threats = []
-        for predator in self.predators:
+        for predator in self.sim.predators:
             if self.pos.distance_to(predator.pos) <= self.view_dist ** 2:
                 self.threats.append(predator)
 

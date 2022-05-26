@@ -111,4 +111,3 @@ class Vector(tuple):
     def side(self, start, point):
         """Returns -1 if the point is on the left and +1 if it is on the right."""
         return math.copysign(1, - self.determinant(start, point))
-
