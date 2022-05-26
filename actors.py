@@ -54,14 +54,6 @@ class Actor:
         self.pos += self.v * dt  # update the position
         self.ahead = 50 * self.v * dt  # update the ahead vector
 
-        self.change_color()
-
-    def change_color(self):
-        red_val = self.speed / self.max_speed * 255
-        blue_val = (1 - self.speed / self.max_speed) * 255
-
-        self.color = (red_val, 0, blue_val)
-
     def calc_avoidance(self):
         small_ahead = self.ahead / 2
         threat = None
@@ -87,7 +79,7 @@ class Actor:
             avoidance = (threat.orthonormal_vector_to(self.pos)) * avoidance_strength / threat_dist
             return avoidance
         elif type(threat) is Circle:
-            avoidance = (self.pos - threat.pos).normalize() * avoidance_strength*20 / threat_dist
+            avoidance = (self.pos - threat.pos).normalize() * avoidance_strength * 20 / threat_dist
             return avoidance
         else:
             return Vector(0, 0)
@@ -111,6 +103,12 @@ class Boid(Actor):
         self.get_neighbors()
         self.forces += self.calc_flocking()
         Actor.update(self, dt)
+
+        self.change_color()
+
+    def change_color(self):
+        red_val = (1 - self.speed / self.max_speed) * 255
+        self.color = (red_val, 255, 0)
 
     def get_neighbors(self):
         """Gets all the neighbors that are visible to the boid."""
@@ -181,3 +179,35 @@ class Boid(Actor):
 
         cohesion = (avg_position - self.pos).normalize() * cohesion_strength
         return cohesion
+
+    def calc_evasion(self):
+        """Calculate the evasion force which makes them evade any predators"""
+        # TODO find the closest predator
+        # TODO calculate the evasion force (see https://gamedevelopment.tutsplus.com/tutorials/understanding-steering-behaviors-pursuit-and-evade--gamedev-2946)
+        evasion = Vector(0, 0)
+        return evasion
+
+
+class Predator(Actor):
+    """Basic predator class."""
+
+    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color):
+        Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
+
+    def update(self, dt):
+        self.forces += self.calc_pursuit()
+        Actor.update(self, dt)
+
+    def calc_pursuit(self):
+        """Calculate the pursuit force which makes them pursuit the closest boid"""
+        target = self.find_target()
+        # TODO calculate the pursuit force (see https://gamedevelopment.tutsplus.com/tutorials/understanding-steering-behaviors-pursuit-and-evade--gamedev-2946)
+        pursuit = Vector(0, 0)
+        return pursuit
+
+    def find_target(self):
+        # TODO check if any boid is within view_distance
+        # TODO check if any of those boids are in field of view (using self.in_fov())
+        # TODO select the closest of those Boids as the new target
+        target = None
+        return target

@@ -5,6 +5,7 @@ from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
 import actors
 from simulation import Simulation
+from actors import Actor, Boid, Predator
 from obstacles import Obstacle, Circle, Wall
 from vectors2d import Vector
 
@@ -18,15 +19,19 @@ BLUE = (0, 0, 255)
 def draw_actors(sim, display):
     """Iterates over all the actors in the simulation and draws them on screen."""
     for actor in sim.actors:
-
         # get the average direction of the last few frames of the actor
         direction = Vector(0, 0)
         for d in actor.dir_history:
             direction += d
         direction /= len(actor.dir_history)
 
-        left = actor.pos - direction * 10 + direction.orthonormal() * 2
-        right = actor.pos - direction * 10 - direction.orthonormal() * 2
+        if type(actor) is Predator:
+            left = actor.pos - direction * 15 + direction.orthonormal() * 5
+            right = actor.pos - direction * 15 - direction.orthonormal() * 5
+        else:
+            left = actor.pos - direction * 10 + direction.orthonormal() * 2
+            right = actor.pos - direction * 10 - direction.orthonormal() * 2
+
         pg.draw.polygon(display, actor.color, points=[actor.pos, left, right])
 
 
@@ -48,9 +53,9 @@ def main(sim, fps, window_size):
 
     mouse_circle = None
 
-    # main game loop
+    # Main game loop
     while True:
-        # get all events
+        # Get all events
         events = pg.event.get()
         for event in events:
             if event.type == pg.QUIT:
