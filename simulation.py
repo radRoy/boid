@@ -9,33 +9,38 @@ class Simulation:
         self.window_size = Vector(window_size[0], window_size[1])
         self.actors = []
         self.obstacles = []
-        self.boid_settings = {"max_speed": 0.1, "view_distance": 50, "view_angle": np.pi, "mass": 5000, "color": (0, 0, 0)}
+        self.boid_settings = {"max_speed": 0.1, "view_distance": 50, "view_angle": np.pi, "mass": 5000,
+                              "color": (0, 0, 0)}
 
     def setup(self, nboids):
+        # Create four walls around the edges and add them to the obstacles
+        top_wall = Wall((0, 0), (self.window_size[0], 0))
+        right_wall = Wall((self.window_size[0], 0), (self.window_size[0], self.window_size[1]))
+        bottom_wall = Wall((self.window_size[0], self.window_size[1]), (0, self.window_size[1]))
+        left_wall = Wall((0, self.window_size[1]), (0, 0))
+        self.add_obstacles(top_wall, right_wall, bottom_wall, left_wall)
+
         # Create random positions and velocities
         x_vals = np.random.uniform(0, self.window_size[0], nboids)
         y_vals = np.random.uniform(0, self.window_size[1], nboids)
         positions = np.column_stack((x_vals, y_vals))
         velocities = np.random.uniform(-1, 1, (nboids, 2))
 
-        # Create four walls around the edges
-        top_wall = Wall((0, 0), (self.window_size[0], 0))
-        right_wall = Wall((self.window_size[0], 0), (self.window_size[0], self.window_size[1]))
-        bottom_wall = Wall((self.window_size[0], self.window_size[1]), (0, self.window_size[1]))
-        left_wall = Wall((0, self.window_size[1]), (0, 0))
-
-        # random_wall1 = Wall((np.random.uniform(0, self.window_size[0]), np.random.uniform(0, self.window_size[1])),
-        #                     (np.random.uniform(0, self.window_size[0]), np.random.uniform(0, self.window_size[1])))
-        # random_wall2 = Wall((np.random.uniform(0, self.window_size[0]), np.random.uniform(0, self.window_size[1])),
-        #                     (np.random.uniform(0, self.window_size[0]), np.random.uniform(0, self.window_size[1])))
-
-        circle = Circle((self.window_size[0]/2, self.window_size[1]/2), 60)
-
-        self.obstacles.extend([top_wall, right_wall, bottom_wall, left_wall, circle])
-
-        flock = []
         # Populate the actors with new boids
-        for i in range(nboids):
+        flock = []
+        self.add_n_boids(nboids, flock, positions, velocities)
+
+    def add_obstacles(self, *args):
+        for obstacle in args:
+            self.obstacles.append(obstacle)
+
+    def delete_obstacles(self, *args):
+        for obstacle in args:
+            self.obstacles.remove(obstacle)
+            del obstacle
+
+    def add_n_boids(self, n, flock, positions, velocities):
+        for i in range(n):
             new = Boid(simulation=self,
                        position=positions[i],
                        velocity=velocities[i],
@@ -49,20 +54,6 @@ class Simulation:
             flock.append(new)
             self.actors.append(new)
 
-    def run(self, steps, dt):
-        for i in range(steps):
-            self.step(dt)
-
     def step(self, dt):
         for actor in self.actors:
             actor.update(dt)
-
-
-def main():
-    sim = Simulation()
-    sim.setup(10)
-    sim.run(100, 1)
-
-
-if __name__ == "__main__":
-    main()

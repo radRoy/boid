@@ -15,58 +15,59 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 
+def draw_actors(sim, display):
+    """Iterates over all the actors in the simulation and draws them on screen."""
+    for actor in sim.actors:
+
+        # get the average direction of the last few frames of the actor
+        direction = Vector(0, 0)
+        for d in actor.dir_history:
+            direction += d
+        direction /= len(actor.dir_history)
+
+        left = actor.pos - direction * 10 + direction.orthonormal() * 2
+        right = actor.pos - direction * 10 - direction.orthonormal() * 2
+        pg.draw.polygon(display, actor.color, points=[actor.pos, left, right])
+
+
+def draw_obstacles(sim, display):
+    """Iterates over all the obstacles in the simulation and draws them on screen."""
+    for obstacle in sim.obstacles:
+        if type(obstacle) is Wall:
+            pg.draw.line(display, BLUE, obstacle.start, obstacle.stop, 10)
+        elif type(obstacle) is Circle:
+            pg.draw.circle(display, BLUE, obstacle.pos, obstacle.rad)
+
+
 def main(sim, fps, window_size):
     """Main function"""
 
     pg.init()
     display = pg.display.set_mode(window_size)
-
-    # Slider(pg.display, dist_left, dist_top, length, width, ...)
-    separation_slider = Slider(display, 10, 10, 100, 10, min=0, max=10.0, step=.01)
-    alignment_slider = Slider(display, 10, 50, 100, 10, min=0, max=10.0, step=.01)
-    cohesion_slider = Slider(display, 10, 90, 100, 10, min=0, max=10.0, step=.01)
-
-    # TextBox(pg.display, dist_left, dist_top, length, width, ...)
-    separation_output = TextBox(display, 45, 30, 25, 25, fontSize=16, borderThickness=1)
-    alignment_output = TextBox(display, 45, 70, 25, 25, fontSize=16, borderThickness=1)
-    cohesion_output = TextBox(display, 45, 110, 25, 25, fontSize=16, borderThickness=1)
-    cohesion_output.disable()  # Act as label instead of textbox
-
-    # TBD: write description for each slider (for the textbox below)
-
     clock = pg.time.Clock()
 
+    mouse_circle = None
+
+    # main game loop
     while True:
+        # get all events
         events = pg.event.get()
         for event in events:
             if event.type == pg.QUIT:
                 sys.exit()
+            elif event.type == pg.MOUSEBUTTONUP:
+                if mouse_circle is not None:
+                    sim.delete_obstacles(mouse_circle)
+                mouse_pos = pg.mouse.get_pos()
+                mouse_circle = Circle(mouse_pos, 20)
+                sim.add_obstacles(mouse_circle)
 
-        dt = clock.tick(fps)
-        sim.step(dt)
         display.fill(WHITE)
+        dt = clock.tick(fps)
 
-        cohesion_output.setText(cohesion_slider.getValue())
-        pg_widgets.update(events)
-
-        # actors.cohesion_strength = cohesion_slider.getValue()
-
-        for actor in sim.actors:
-            direction = Vector(0, 0)
-            for d in actor.dir_history:
-                direction += d
-            direction /= len(actor.dir_history)
-
-            left = actor.pos - direction * 10 + direction.orthonormal() * 2
-            right = actor.pos - direction * 10 - direction.orthonormal() * 2
-            pg.draw.polygon(display, actor.color, points=[actor.pos, left, right])
-            pg.draw.line(display, GREEN, actor.pos, actor.pos + actor.ahead)
-
-        for obstacle in sim.obstacles:
-            if type(obstacle) is Wall:
-                pg.draw.line(display, BLUE, obstacle.start, obstacle.stop, 10)
-            elif type(obstacle) is Circle:
-                pg.draw.circle(display, BLUE, obstacle.pos, obstacle.rad)
+        sim.step(dt)
+        draw_actors(sim, display)
+        draw_obstacles(sim, display)
 
         pg.display.update()
 
