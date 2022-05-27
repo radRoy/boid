@@ -9,9 +9,6 @@ class Obstacle:
     def __init__(self, position):
         self.pos = Vector(position[0], position[1])
 
-    def plot(self, ax):
-        ax.scatter([self.pos.x], [self.pos.y])
-
 
 class Circle(Obstacle):
     """A circular obstacle."""
@@ -19,6 +16,7 @@ class Circle(Obstacle):
     def __init__(self, position, radius):
         Obstacle.__init__(self, position)
         self.rad = radius
+        self.rad_sq = radius**2
 
 
 class Wall(Obstacle):
@@ -48,6 +46,11 @@ class Wall(Obstacle):
         """Calculates the distance of the wall to a point"""
 
         return abs(self.determinant(point) / self.length)
+
+    def distance_sq_to(self, point):
+        """Calculates the distance squared of the wall to a point"""
+
+        return (self.determinant(point) / self.length)**2
 
     def intersects(self, point, vector):
         """Determines if a line given by a start point and a vector intersects the wall."""

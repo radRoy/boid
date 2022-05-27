@@ -1,3 +1,4 @@
+import random
 from vectors2d import Vector
 from obstacles import Circle, Wall
 import math
@@ -5,6 +6,7 @@ import math
 avoidance_strength = 100.0
 separation_strength = 4.0
 separation_radius = 20.0
+sep_rad_sq = separation_radius ** 2
 alignment_strength = 1.0
 cohesion_strength = 1.0
 evasion_strength = 100.0
@@ -26,6 +28,7 @@ class Actor:
         self.max_speed = float(max_speed)  # the maximum speed the actor can travel at
 
         self.view_dist = float(view_distance)  # how far the actor can see
+        self.view_dist_sq = self.view_dist ** 2
         self.view_angle = float(view_angle)  # in radians
         self.ahead = self.v  # look ahead vector to avoid collision
 
@@ -34,6 +37,7 @@ class Actor:
 
     def update(self, dt):
         """Updates all the actor attributes. Call this every frame after calculating all the forces."""
+
         self.forces += self.calc_avoidance()
         acceleration = self.forces / self.mass
 
@@ -53,8 +57,8 @@ class Actor:
 
         self.forces = Vector(0, 0)  # reset all the forces after applying them
 
-        if not 0 <= self.pos.x <= self.sim.window_size[0] or not 0 <= self.pos.y <= self.sim.window_size[1]:
-            self.v = (self.sim.center - self.pos).normalize()*self.max_speed
+        if not 0 <= self.pos.x <= self.sim.window_size.x or not 0 <= self.pos.y <= self.sim.window_size.y:
+            self.v = (self.sim.center - self.pos).normalize() * self.max_speed
 
         self.pos += self.v * dt  # update the position
         self.ahead = 50 * self.v * dt  # update the ahead vector
@@ -62,28 +66,30 @@ class Actor:
     def calc_avoidance(self):
         small_ahead = self.ahead / 2
         threat = None
-        threat_dist = None
+        threat_dist_sq = None
 
         for obstacle in self.sim.obstacles:
             if type(obstacle) is Wall:
-                dist = obstacle.distance_to(self.pos)
-                if threat_dist is None or dist < threat_dist:
+                dist_sq = max(0.0000001, obstacle.distance_sq_to(self.pos))
+                if threat_dist_sq is None or dist_sq < threat_dist_sq:
                     if obstacle.intersects(self.pos, self.ahead):
                         threat = obstacle
-                        threat_dist = dist
+                        threat_dist_sq = dist_sq
             elif type(obstacle) is Circle:
-                dist = max(0.0000001, self.pos.distance_to(obstacle.pos) - obstacle.rad)
-                if threat_dist is None or dist < threat_dist:
-                    close_dist = (self.pos + small_ahead).distance_to(obstacle.pos)
-                    far_dist = (self.pos + self.ahead).distance_to(obstacle.pos)
-                    if close_dist <= obstacle.rad or far_dist <= obstacle.rad or dist <= obstacle.rad:
+                dist_sq = max(0.0000001, self.pos.distance_sq_to(obstacle.pos) - obstacle.rad_sq)
+                if threat_dist_sq is None or dist_sq < threat_dist_sq:
+                    close_dist_sq = (self.pos + small_ahead).distance_sq_to(obstacle.pos)
+                    far_dist_sq = (self.pos + self.ahead).distance_sq_to(obstacle.pos)
+                    if close_dist_sq <= obstacle.rad_sq or far_dist_sq <= obstacle.rad_sq or dist_sq <= obstacle.rad_sq:
                         threat = obstacle
-                        threat_dist = dist
+                        threat_dist_sq = dist_sq
 
         if type(threat) is Wall:
+            threat_dist = math.sqrt(threat_dist_sq)
             avoidance = (threat.orthonormal_vector_to(self.pos)) * avoidance_strength / threat_dist
             return avoidance
         elif type(threat) is Circle:
+            threat_dist = math.sqrt(threat_dist_sq)
             avoidance = (self.pos - threat.pos).normalize() * avoidance_strength / threat_dist
             return avoidance
         else:
@@ -101,17 +107,22 @@ class Boid(Actor):
 
     def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color):
         Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
-        # self.predators = predators  # all the predators in the simulation
         self.neighbors = []  # all boids that are close
-        self.threats = []  # all predators that are close (and in fov)
+        self.flocking = Vector(0, 0)
+        self.update_this_frame = bool(random.getrandbits(1))
 
     def update(self, dt):
-        self.get_neighbors()
-        self.forces += self.calc_flocking()
+        # only update neighbors and flocking force every second frame
+        if self.update_this_frame:
+            self.get_neighbors()
+            self.calc_flocking()
+
+        self.forces += self.flocking
         self.forces += self.calc_evasion()
         Actor.update(self, dt)
-
         self.change_color()
+
+        self.update_this_frame = not self.update_this_frame
 
     def change_color(self):
         red_val = (1 - self.speed / self.max_speed) * 255
@@ -123,15 +134,21 @@ class Boid(Actor):
         for member in self.sim.flock:
             if member is self:
                 continue
-            elif self.pos.distance_to(member.pos) <= self.view_dist and self.in_fov(member.pos):
+            elif self.pos.distance_sq_to(member.pos) <= self.view_dist_sq and self.in_fov(member.pos):
                 self.neighbors.append(member)
 
-    def get_threats(self):
-        """Gets all the predators and that are visible to the boid and classifies them as threats. Creates self.threats list."""
-        self.threats = []
-        for predator in self.sim.predators:
-            if self.pos.distance_to(predator.pos) <= self.view_dist:
-                self.threats.append(predator)
+    def get_threat(self):
+        closest_threat = None
+        closest_dist_sq = None
+
+        for threat in self.sim.predators:
+            dist_sq = self.pos.distance_sq_to(threat.pos)
+            if dist_sq <= self.view_dist_sq and self.in_fov(threat.pos):
+                if closest_threat is None or dist_sq < closest_dist_sq:
+                    closest_threat = threat
+                    closest_dist_sq = dist_sq
+
+        return closest_threat, closest_dist_sq
 
     def calc_flocking(self):
         """Calculates all the flocking forces."""
@@ -139,7 +156,7 @@ class Boid(Actor):
         alignment = self.calc_alignment()
         cohesion = self.calc_cohesion()
 
-        return separation + alignment + cohesion
+        self.flocking = separation + alignment + cohesion
 
     def calc_separation(self):
         """Calculate the separation force of the boids which makes them keep a minimum distance from each other."""
@@ -150,11 +167,11 @@ class Boid(Actor):
         close_neighbors = 0  # the number of neighbors that are within a given separation radius
 
         for neighbor in self.neighbors:
-            distance = self.pos.distance_to(neighbor.pos)  # distance to the neighbor
-            if distance <= separation_radius:
+            dist_sq = self.pos.distance_sq_to(neighbor.pos)  # distance to the neighbor
+            if dist_sq <= sep_rad_sq:
                 close_neighbors += 1
                 # divide by distance such that the separation force is stronger for closer neighbors.
-                avg_evasion += (self.pos - neighbor.pos) / distance  # vector pointing away from the neighbor
+                avg_evasion += (self.pos - neighbor.pos) / math.sqrt(dist_sq)  # vector pointing away from the neighbor
 
         if close_neighbors == 0:
             return Vector(0, 0)
@@ -196,21 +213,20 @@ class Boid(Actor):
 
     def calc_evasion(self):
         """Calculate the evasion force which makes them evade any predators"""
-        closest_threat = None
-        self.get_threats()
-        for threat in self.threats:
-            if closest_threat is None:
-                closest_threat = threat
-                continue
-            elif self.pos.distance_to(threat.pos) < self.pos.distance_to(closest_threat.pos):
-                closest_threat = threat
+        threat, dist_sq = self.get_threat()
 
-        if closest_threat is None:
-            evasion = Vector(0, 0)
-        else:
-            distance = self.pos.distance_to(closest_threat.pos)
-            direction = closest_threat.v.side(closest_threat.pos, self.pos) * closest_threat.v.orthonormal()
-            evasion = direction * evasion_strength / distance
+        if threat is None:
+            return Vector(0, 0)
+
+        distance = math.sqrt(dist_sq)
+
+        # if distance <= 5.0:
+        #     print(f"I was eaten!")
+        #     self.sim.actors.remove(self)
+        #     self.sim.flock.remove(self)
+
+        direction = threat.v.side(threat.pos, self.pos) * threat.v.orthonormal()
+        evasion = direction * evasion_strength / distance
 
         return evasion
 
@@ -220,7 +236,6 @@ class Predator(Actor):
 
     def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color):
         Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
-        self.targets = []
 
     def update(self, dt):
         self.forces += self.calc_pursuit(dt)
@@ -228,38 +243,25 @@ class Predator(Actor):
 
     def calc_pursuit(self, dt):
         """Calculate the pursuit force which makes them pursuit the closest boid"""
-        target = self.find_target()
+        target, dist_sq = self.find_target()
         if target is None:
             pursuit = Vector(0, 0)
         else:
-            # TODO calculate the pursuit acceleration
+            dist = math.sqrt(dist_sq)
             direction = self.pos.direction_to(target.pos + target.v * 50 * dt)
-            distance = self.pos.distance_to(target.pos)
-            pursuit = pursuit_strength * direction / distance
+            pursuit = pursuit_strength * direction / dist
 
         return pursuit
 
     def find_target(self):
-        # TODO check if any boid is within view_distance
-        around = False
-        for boid in self.sim.flock:
-            if self.pos.distance_to(boid.pos) < self.view_dist:
-                around = True
-                break
+        closest_target = None
+        closest_dist_sq = None
 
-        # TODO check if any of those boids are in field of view (using self.in_fov())
-        if around:
-            for boid in self.sim.flock:
-                if self.pos.distance_to(boid.pos) < self.view_dist and self.in_fov(boid.pos):
-                    self.targets.append(boid)
-
-        # TODO select the closest of those Boids as the new target
-        if len(self.targets) > 0:
-            closest_target = self.targets[0]
-            for target in self.targets:
-                if closest_target is not target and self.pos.distance_to(target.pos) < self.pos.distance_to(closest_target.pos):
+        for target in self.sim.flock:
+            dist_sq = self.pos.distance_sq_to(target.pos)
+            if dist_sq <= self.view_dist_sq and self.in_fov(target.pos):
+                if closest_target is None or dist_sq < closest_dist_sq:
                     closest_target = target
-        else:
-            target = None
+                    closest_dist_sq = dist_sq
 
-        return target
+        return closest_target, closest_dist_sq

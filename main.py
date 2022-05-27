@@ -103,12 +103,16 @@ def setup_buttons(sim):
     font = pg.font.Font("freesansbold.ttf", 24)
     reset_text = font.render("reset", True, (0, 0, 0), (200, 200, 200))
     reset_rect = reset_text.get_rect()
-    reset_rect.center = (sim.window_size.x - 48, 24)
+    reset_rect.center = (sim.window_size.x - 96, 24)
     clear_text = font.render("clear", True, (0, 0, 0), (200, 200, 200))
     clear_rect = clear_text.get_rect()
-    clear_rect.center = (sim.window_size.x - 48, 52)
+    clear_rect.center = (sim.window_size.x - 96, 52)
+    predator_text = font.render("predator", True, (0, 0, 0), (200, 200, 200))
+    predator_rect = clear_text.get_rect()
+    predator_rect.center = (sim.window_size.x - 96, 80)
 
-    buttons = {"clear_text": clear_text, "clear_rect": clear_rect, "reset_text": reset_text, "reset_rect": reset_rect}
+    buttons = {"clear_text": clear_text, "clear_rect": clear_rect, "reset_text": reset_text, "reset_rect": reset_rect,
+               "predator_text": predator_text, "predator_rect": predator_rect}
 
     return buttons
 
@@ -116,6 +120,7 @@ def setup_buttons(sim):
 def draw_buttons(display, buttons):
     display.blit(buttons["clear_text"], buttons["clear_rect"])
     display.blit(buttons["reset_text"], buttons["reset_rect"])
+    display.blit(buttons["predator_text"], buttons["predator_rect"])
 
 
 def draw_actors(sim, display):
@@ -170,6 +175,10 @@ def main(sim, fps, window_size):
                     sim.reset()
                 elif buttons["clear_rect"].collidepoint(pg.mouse.get_pos()):
                     sim.clear_obstacles()
+                elif buttons["predator_rect"].collidepoint(pg.mouse.get_pos()):
+                    v = np.random.uniform(-1, 1, 2)
+                    velocity = Vector(v[0], v[1]).normalize()
+                    sim.add_predator(sim.center, velocity=velocity, view_angle=np.pi/2)
             elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
                 mouse_pos = pg.mouse.get_pos()
                 sim.add_obstacles(Circle(mouse_pos, 20))
@@ -199,7 +208,7 @@ def main(sim, fps, window_size):
 
 if __name__ == "__main__":
     res = (1080, 720)
-    sim_test = Simulation(res, 80)
+    sim_test = Simulation(res, 200)
     sim_test.setup()
 
     main(sim=sim_test, fps=30, window_size=res)

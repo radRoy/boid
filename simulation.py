@@ -33,9 +33,6 @@ class Simulation:
         # Populate the simulation with new boids
         self.add_n_boids(self.nboids, positions, velocities)
 
-        # add a predator
-        self.add_predator(self.center, (1, 0), view_angle=np.pi/2)
-
     def add_obstacles(self, *args):
         for obstacle in args:
             self.obstacles.append(obstacle)
