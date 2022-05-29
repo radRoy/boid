@@ -47,6 +47,9 @@ class Vector(tuple):
         elif key == 1:
             return Vector(self.x, value)
 
+    def __abs__(self):
+        return self.length()
+
     def length_sq(self):
         """Returns the squared length (magnitude) of the vector."""
         return (self.x * self.x) + (self.y * self.y)

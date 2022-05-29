@@ -171,11 +171,12 @@ def main(sim, fps, window_size):
             if event.type == pg.QUIT:
                 sys.exit()
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                if buttons["reset_rect"].collidepoint(pg.mouse.get_pos()):
+                mouse_pos = pg.mouse.get_pos()
+                if buttons["reset_rect"].collidepoint(mouse_pos):
                     sim.reset()
-                elif buttons["clear_rect"].collidepoint(pg.mouse.get_pos()):
+                elif buttons["clear_rect"].collidepoint(mouse_pos):
                     sim.clear_obstacles()
-                elif buttons["predator_rect"].collidepoint(pg.mouse.get_pos()):
+                elif buttons["predator_rect"].collidepoint(mouse_pos):
                     v = np.random.uniform(-1, 1, 2)
                     velocity = Vector(v[0], v[1]).normalize()
                     sim.add_predator(sim.center, velocity=velocity, view_angle=np.pi/2)
@@ -183,10 +184,11 @@ def main(sim, fps, window_size):
                 mouse_pos = pg.mouse.get_pos()
                 sim.add_obstacles(Circle(mouse_pos, 20))
             elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                mouse_pos = Vector(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
                 if wall_start is None:
-                    wall_start = pg.mouse.get_pos()
-                else:
-                    wall_stop = pg.mouse.get_pos()
+                    wall_start = mouse_pos
+                elif abs(wall_start - mouse_pos) >= 0.00001:
+                    wall_stop = mouse_pos
                     wall = Wall(wall_start, wall_stop)
                     sim.add_obstacles(wall)
                     wall_start = None
