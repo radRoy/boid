@@ -15,6 +15,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+BACKGROUND = (42, 57, 144)
 
 
 def setup_sliders(display):
@@ -213,7 +214,7 @@ def main(sim, fps, window_size):
 
 if __name__ == "__main__":
     res = (1080, 720)
-    Sim = Simulation(res, 100)
+    Sim = Simulation(res, 200)
     Sim.setup()
 
     main(sim=Sim, fps=30, window_size=res)

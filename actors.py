@@ -221,7 +221,6 @@ class Boid(Actor):
         distance = math.sqrt(dist_sq)
 
         # if distance <= 5.0:
-        #     print(f"I was eaten!")
         #     self.sim.actors.remove(self)
         #     self.sim.flock.remove(self)
 
@@ -237,9 +236,13 @@ class Predator(Actor):
     def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color):
         Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
 
+        self.update_this_frame = bool(random.getrandbits(1))
+
     def update(self, dt):
-        self.forces += self.calc_pursuit(dt)
+        if self.update_this_frame:
+            self.forces += self.calc_pursuit(dt)
         Actor.update(self, dt)
+        self.update_this_frame = not self.update_this_frame
 
     def calc_pursuit(self, dt):
         """Calculate the pursuit force which makes them pursuit the closest boid"""
