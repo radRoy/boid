@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import pygame as pg
-import pygame_widgets as pg_widgets
+from pygame_widgets import update as update_widgets
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
 import actors
@@ -37,32 +37,30 @@ def setup_sliders(display):
     sep_slider = Slider(display, s_left, s_top, s_width, s_height, min=0.0, max=10.0, step=.1)
     sep_slider.setValue(4.0)
     sep_out = TextBox(display, t_left, t_top, 0, t_height, fontSize=fontsize, borderThickness=1)
-    sep_label = TextBox(display, s_left, s_top + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1).setText(
-        "Separation")
+    sep_label = TextBox(display, s_left, s_top + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1)\
+        .setText("Separation")
 
     align_slider = Slider(display, s_left, s_top + s_dist, s_width, s_height, min=0.0, max=10.0, step=.1)
     align_slider.setValue(1.0)
     align_out = TextBox(display, t_left, t_top + s_dist, 0, t_height, fontSize=fontsize, borderThickness=1)
-    align_label = TextBox(display, s_left, s_top + s_dist + t_dist, 0, t_height, fontSize=fontsize,
-                          borderThickness=1).setText("Alignment")
+    align_label = TextBox(display, s_left, s_top + s_dist + t_dist, 0, t_height, fontSize=fontsize, borderThickness=1)\
+        .setText("Alignment")
 
     coh_slider = Slider(display, s_left, s_top + s_dist * 2, s_width, s_height, min=0.0, max=10.0, step=.1)
     coh_slider.setValue(1.0)
     coh_out = TextBox(display, t_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1)
-    coh_label = TextBox(display, s_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1).setText(
-        "Cohesion")
+    coh_label = TextBox(display, s_left, t_top + s_dist * 2, 0, t_height, fontSize=fontsize, borderThickness=1)\
+        .setText("Cohesion")
 
+    "spare sliders, pre-arranged to appear below existing ones"
     # sep_rad_slider = Slider(display, s_left, s_top + s_dist * 4, s_width, s_height, min=0.0, max=80.0, step=.1)
     # sep_rad_slider.setValue(20.0)
     # sep_rad_out = TextBox(display, t_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize, borderThickness=1)
-    # sep_rad_label = TextBox(display, s_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize,
-    #                         borderThickness=1).setText("Separation rad")
-    #
+    # sep_rad_label = TextBox(display, s_left, t_top + s_dist * 4, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Separation rad")
     # avoid_slider = Slider(display, s_left, s_top + s_dist * 5, s_width, s_height, min=0.0, max=400.0, step=1)
     # avoid_slider.setValue(100.0)
     # avoid_out = TextBox(display, t_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize, borderThickness=1)
-    # avoid_label = TextBox(display, s_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize,
-    #                       borderThickness=1).setText("Avoidance")
+    # avoid_label = TextBox(display, s_left, t_top + s_dist * 5, 0, t_height, fontSize=fontsize, borderThickness=1).setText("Avoidance")
 
     # slider_6 = Slider(display, s_left, s_top + s_dist * 6, s_width, s_height, min=0.0, max=10.0, step=.1)
     # slider_6_out = TextBox(display, t_left, t_top + s_dist * 6, 0, t_height, fontSize=fontsize, borderThickness=1)
@@ -77,21 +75,21 @@ def setup_sliders(display):
     # slider_9_out = TextBox(display, t_left, t_top + s_dist * 9, 0, t_height, fontSize=fontsize, borderThickness=1)
     # slider_9_label = TextBox(display, s_left, t_top + s_dist * 9, 0, t_height, fontSize=fontsize, borderThickness=1).setText("slider 9")
 
-    slider_settings = {"sep_slider": sep_slider, "coh_slider": coh_slider, "align_slider": align_slider,
-                       "sep_out": sep_out, "coh_out": coh_out, "align_out": align_out}
-
-    return slider_settings
+    return {"sep_slider": sep_slider, "coh_slider": coh_slider, "align_slider": align_slider,
+            "sep_out": sep_out, "coh_out": coh_out, "align_out": align_out}  # slider_settings created/updated
 
 
 def slider_update(slider_settings):
+    """reads slider values, updates sim. parameters (actors) and number displayed in next frame"""
+
     # feeding slider values into simulation parameters
-    actors.separation_strength = slider_settings["sep_slider"].getValue()  # 7.0 (yep, dem is birds, alright)
-    actors.cohesion_strength = slider_settings["coh_slider"].getValue()  # 3.0
-    actors.alignment_strength = slider_settings["align_slider"].getValue()  # 3.5
+    actors.separation_strength = slider_settings["sep_slider"].getValue()
+    actors.cohesion_strength = slider_settings["coh_slider"].getValue()
+    actors.alignment_strength = slider_settings["align_slider"].getValue()
     # actors.separation_radius = slider_settings["sep_rad_slider"].getValue()
     # actors.avoidance_strength = slider_settings["avoid_slider"].getValue()
 
-    # each following drawing command draws on top of previous ones (so, leave widgets.update on top)
+    # each following drawing command draws on top of previous ones
     slider_settings["sep_out"].setText(np.round(actors.separation_strength, 3))
     slider_settings["coh_out"].setText(np.round(actors.cohesion_strength, 3))
     slider_settings["align_out"].setText(np.round(actors.alignment_strength, 3))
@@ -111,13 +109,12 @@ def setup_buttons(sim):
     predator_rect = clear_text.get_rect()
     predator_rect.center = (sim.window_size.x - 96, 80)
 
-    buttons = {"clear_text": clear_text, "clear_rect": clear_rect, "reset_text": reset_text, "reset_rect": reset_rect,
-               "predator_text": predator_text, "predator_rect": predator_rect}
-
-    return buttons
+    return {"clear_text": clear_text, "clear_rect": clear_rect, "reset_text": reset_text, "reset_rect": reset_rect,
+            "predator_text": predator_text, "predator_rect": predator_rect}  # buttons created/updated
 
 
 def draw_buttons(display, buttons):
+    """draws (blits) the buttons to the display"""
     display.blit(buttons["clear_text"], buttons["clear_rect"])
     display.blit(buttons["reset_text"], buttons["reset_rect"])
     display.blit(buttons["predator_text"], buttons["predator_rect"])
@@ -153,11 +150,9 @@ def draw_obstacles(sim, display):
 
 def main(sim, fps, window_size):
     """Main function"""
-
     pg.init()
     display = pg.display.set_mode(window_size)
     clock = pg.time.Clock()
-
     slider_settings = setup_sliders(display)
     buttons = setup_buttons(sim)
 
@@ -165,11 +160,15 @@ def main(sim, fps, window_size):
 
     # Main game loop
     while True:
+
         # Get all events
         events = pg.event.get()
         for event in events:
+            # exit the (py) interpreter (end program) if the pygame windows is closed
             if event.type == pg.QUIT:
-                sys.exit()
+                sys.exit()  # prints 1 in case of error(s)
+
+            # react to the pushing of the left mouse button
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 mouse_pos = pg.mouse.get_pos()
                 if buttons["reset_rect"].collidepoint(mouse_pos):
@@ -180,9 +179,12 @@ def main(sim, fps, window_size):
                     v = np.random.uniform(-1, 1, 2)
                     velocity = Vector(v[0], v[1]).normalize()
                     sim.add_predator(sim.center, velocity=velocity, view_angle=np.pi/2)
+
+            # react to the releasing of the right mouse button
             elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
                 mouse_pos = pg.mouse.get_pos()
                 sim.add_obstacles(Circle(mouse_pos, 20))
+
             elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 mouse_pos = Vector(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
                 if wall_start is None:
@@ -193,24 +195,25 @@ def main(sim, fps, window_size):
                     sim.add_obstacles(wall)
                     wall_start = None
 
+        # preaparing the next empty frame
         display.fill(WHITE)
         dt = clock.tick(fps)
+        slider_update(slider_settings)  # fetching parameters (live!)
+        sim.step(dt)  # applying parameters instantly (live!) simulating movements in the next frame
 
-        slider_update(slider_settings)
-
-        sim.step(dt)
+        # drawing what is to be drawn
         draw_actors(sim, display)
-        draw_obstacles(sim, display)
+        draw_obstacles(sim, display)  # TBD: FIX BOTTOM BOUNDARY (incl. weird avoidance behaviour)
+            # boids react to the bottom display wall as if it was invisible, sort of like a window. poor fellows...
         draw_buttons(display, buttons)
-
-        pg_widgets.update(events)
-
+        update_widgets(events)
         pg.display.update()
+    # end of the Main game loop
 
 
 if __name__ == "__main__":
     res = (1080, 720)
-    sim_test = Simulation(res, 200)
+    sim_test = Simulation(res, 100)
     sim_test.setup()
 
     main(sim=sim_test, fps=30, window_size=res)
