@@ -68,7 +68,7 @@ def calc_evasion(actor, threat, dist_sq):
 
     if dist <= 5.0:
         actor.sim.actors.remove(actor)
-        actor.sim.flock.remove(actor)
+        actor.sim.prey.remove(actor)
 
     direction = threat.v.side(threat.pos, actor.pos) * threat.v.orthonormal()
     evasion = direction * evasion_strength / dist

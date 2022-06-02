@@ -178,7 +178,7 @@ def main(sim, fps, window_size):
 
 if __name__ == "__main__":
     res = (1080, 720)
-    Sim = Simulation(res, 200)
+    Sim = Simulation(res, 100)
     Sim.setup()
 
     main(sim=Sim, fps=30, window_size=res)

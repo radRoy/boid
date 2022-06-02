@@ -65,6 +65,7 @@ class Boid(Actor):
 
     def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color):
         Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
+        self.flock = []  # all boids of the same species
         self.neighbors = []  # all boids that are close
         self.flocking = Vector(0, 0)
         self.update_this_frame = bool(random.getrandbits(1))
@@ -76,10 +77,7 @@ class Boid(Actor):
             self.calc_flocking()
 
         self.forces += self.flocking
-        threat, threat_dist_sq = self.get_threat()
-        self.forces += steering.calc_evasion(self, threat, threat_dist_sq)
         Actor.update(self, dt)
-        self.change_color()
 
         self.update_this_frame = not self.update_this_frame
 
@@ -98,11 +96,30 @@ class Boid(Actor):
     def get_neighbors(self):
         """Gets all the neighbors that are visible to the boid."""
         self.neighbors = []
-        for member in self.sim.flock:
+        for member in self.flock:
             if member is self:
                 continue
             elif self.pos.distance_sq_to(member.pos) <= self.view_dist_sq and self.in_fov(member.pos):
                 self.neighbors.append(member)
+
+
+class Prey(Boid):
+    """Prey class."""
+
+    def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color):
+        Boid.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
+        self.flock = self.sim.prey
+
+    def update(self, dt):
+        threat, threat_dist_sq = self.get_threat()
+        self.forces += steering.calc_evasion(self, threat, threat_dist_sq)
+        Boid.update(self, dt)
+
+        self.change_color()
+
+    def change_color(self):
+        red_val = (1 - self.speed / self.max_speed) * 255
+        self.color = (red_val, 255, 0)
 
     def get_threat(self):
         closest_threat = None
@@ -118,27 +135,24 @@ class Boid(Actor):
         return closest_threat, closest_dist_sq
 
 
-class Predator(Actor):
+class Predator(Boid):
     """Basic predator class."""
 
     def __init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color):
-        Actor.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
-
-        self.update_this_frame = bool(random.getrandbits(1))
+        Boid.__init__(self, simulation, position, velocity, max_speed, view_distance, view_angle, mass, color)
+        self.flock = self.sim.predators
 
     def update(self, dt):
-        if self.update_this_frame:
-            target, target_dist_sq = self.find_target()
-            self.forces += steering.calc_pursuit(self, dt, target, target_dist_sq)
-        Actor.update(self, dt)
-        self.update_this_frame = not self.update_this_frame
+        target, target_dist_sq = self.find_target()
+        self.forces += steering.calc_pursuit(self, dt, target, target_dist_sq)
+        Boid.update(self, dt)
 
     def find_target(self):
         """Find the nearest target"""
         closest_target = None
         closest_dist_sq = None
 
-        for target in self.sim.flock:
+        for target in self.sim.prey:
             dist_sq = self.pos.distance_sq_to(target.pos)
             if dist_sq <= self.view_dist_sq and self.in_fov(target.pos):
                 if closest_target is None or dist_sq < closest_dist_sq:
